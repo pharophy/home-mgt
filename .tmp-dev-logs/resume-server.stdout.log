@@ -1,0 +1,39 @@
+
+> server@0.1.0 dev
+> tsx watch src/index.ts
+
+◇ injected env (1) from ..\.env // tip: ⌘ enable debugging { debug: true }
+API listening on http://localhost:3001
+6:01:13 PM [tsx] change in ./src\lib\completion-images.ts Restarting...
+c◇ injected env (1) from ..\.env // tip: ⌘ override existing { override: true }
+API listening on http://localhost:3001
+6:08:17 PM [tsx] change in ./src\routes\completion-images.ts Restarting...
+c◇ injected env (1) from ..\.env // tip: ⌁ auth for agents [www.vestauth.com]
+API listening on http://localhost:3001
+6:08:22 PM [tsx] change in ./src\routes\completion-images.ts Restarting...
+c◇ injected env (1) from ..\.env // tip: ◈ encrypted .env [www.dotenvx.com]
+API listening on http://localhost:3001
+6:08:25 PM [tsx] change in ./src\app.ts Restarting...
+c◇ injected env (1) from ..\.env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+API listening on http://localhost:3001
+6:12:17 PM [tsx] change in ./src\app.ts Restarting...
+c◇ injected env (1) from ..\.env // tip: ⌘ override existing { override: true }
+API listening on http://localhost:3001
+6:12:56 PM [tsx] change in ./src\lib\sql-store.ts Restarting...
+c◇ injected env (1) from ..\.env // tip: ◈ secrets for agents [www.dotenvx.com]
+API listening on http://localhost:3001
+6:13:11 PM [tsx] change in ./src\lib\sql-store.ts Restarting...
+c◇ injected env (1) from ..\.env // tip: ⌘ enable debugging { debug: true }
+API listening on http://localhost:3001
+7:15:37 PM [tsx] change in ./src\lib\sql-store.ts Rerunning...
+c◇ injected env (2) from ..\.env // tip: ◈ encrypted .env [www.dotenvx.com]
+API listening on http://localhost:3001
+7:20:23 PM [tsx] change in ./src\lib\sql-store.ts Rerunning...
+c◇ injected env (2) from ..\.env // tip: ⌘ enable debugging { debug: true }
+API listening on http://localhost:3001
+7:24:03 PM [tsx] change in ./src\lib\sql-store.ts Rerunning...
+c◇ injected env (2) from ..\.env // tip: ⌘ multiple files { path: ['.env.local', '.env'] }
+API listening on http://localhost:3001
+7:33:52 PM [tsx] change in ./src\routes\routines.ts Rerunning...
+c◇ injected env (2) from ..\.env // tip: ⌁ auth for agents [www.vestauth.com]
+API listening on http://localhost:3001

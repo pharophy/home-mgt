@@ -1,0 +1,8 @@
+ConnectionError: [Microsoft][ODBC Driver Manager] Data source name not found and no default driver specified
+    at PrivateConnection.callback2 (C:\Users\shawn\Web Development\home-mgt\node_modules\mssql\lib\msnodesqlv8\connection-pool.js:53:17)
+    at Immediate.<anonymous> (C:\Users\shawn\Web Development\home-mgt\node_modules\msnodesqlv8\lib\connection.js:47:14)
+    at process.processImmediate (node:internal/timers:491:21)
+ConnectionError: [Microsoft][ODBC Driver Manager] Data source name not found and no default driver specified
+    at PrivateConnection.callback2 (C:\Users\shawn\Web Development\home-mgt\node_modules\mssql\lib\msnodesqlv8\connection-pool.js:53:17)
+    at Immediate.<anonymous> (C:\Users\shawn\Web Development\home-mgt\node_modules\msnodesqlv8\lib\connection.js:47:14)
+    at process.processImmediate (node:internal/timers:491:21)

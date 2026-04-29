@@ -1,0 +1,216 @@
+{
+  "schemaVersion": 1,
+  "householdRoles": {
+    "parentAdmins": [
+      "parent-1"
+    ]
+  },
+  "householdSettings": {
+    "celebrationMode": "full"
+  },
+  "childProfiles": [
+    {
+      "id": "7a2494e8-2b60-43f6-a387-d9f8c26fd068",
+      "name": "a",
+      "color": "#a78244",
+      "motivators": [],
+      "createdAt": "2026-04-26T18:36:18.442Z",
+      "updatedAt": "2026-04-26T18:36:18.442Z"
+    },
+    {
+      "id": "23306dc1-8f5f-4cb8-9349-0c00c62ba9f1",
+      "name": "Ayden",
+      "color": "#324abd",
+      "motivators": [
+        "bluey",
+        "paw patrol"
+      ],
+      "createdAt": "2026-04-27T15:35:38.620Z",
+      "updatedAt": "2026-04-27T15:35:38.620Z"
+    }
+  ],
+  "routines": [
+    {
+      "id": "b26a8a40-c7b6-42fa-89a2-748116ffdce5",
+      "childProfileId": "7a2494e8-2b60-43f6-a387-d9f8c26fd068",
+      "name": "Wash dishes",
+      "schedule": {
+        "days": [
+          "monday",
+          "wednesday",
+          "sunday",
+          "tuesday"
+        ]
+      },
+      "steps": [
+        {
+          "id": "dd4ee8a0-4f6f-4e8e-b4e0-133792ea49d0",
+          "label": "1",
+          "order": 0
+        }
+      ],
+      "createdAt": "2026-04-26T18:36:32.796Z",
+      "updatedAt": "2026-04-29T00:38:25.883Z",
+      "imageUrl": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22320%22%20height%3D%22200%22%20viewBox%3D%220%200%20320%20200%22%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%22320%22%20height%3D%22200%22%20rx%3D%2224%22%20fill%3D%22%23e8f6ef%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%2256%22%20cy%3D%2246%22%20r%3D%2218%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.35%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%22270%22%20cy%3D%2254%22%20r%3D%2214%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.22%22%20%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%2288%22%20font-size%3D%2218%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23243042%22%3EWash%20dishes%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22122%22%20font-size%3D%2214%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23526173%22%3EInspired%20by%201%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22156%22%20font-size%3D%2212%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%237a8794%22%3EOriginal%20celebration%20art%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E"
+    },
+    {
+      "id": "2db3d20c-e72b-425c-9e61-6c05dc9f7280",
+      "childProfileId": "7a2494e8-2b60-43f6-a387-d9f8c26fd068",
+      "name": "Brush teeth",
+      "schedule": {
+        "days": [
+          "sunday",
+          "monday",
+          "tuesday"
+        ]
+      },
+      "steps": [
+        {
+          "id": "5ff07d6c-72e5-4077-b842-27fcf8112acc",
+          "label": "2",
+          "order": 0
+        }
+      ],
+      "createdAt": "2026-04-26T18:36:41.691Z",
+      "updatedAt": "2026-04-29T00:38:23.276Z",
+      "imageUrl": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22320%22%20height%3D%22200%22%20viewBox%3D%220%200%20320%20200%22%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%22320%22%20height%3D%22200%22%20rx%3D%2224%22%20fill%3D%22%23e8f6ef%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%2256%22%20cy%3D%2246%22%20r%3D%2218%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.35%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%22270%22%20cy%3D%2254%22%20r%3D%2214%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.22%22%20%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%2288%22%20font-size%3D%2218%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23243042%22%3EBrush%20teeth%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22122%22%20font-size%3D%2214%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23526173%22%3EInspired%20by%202%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22156%22%20font-size%3D%2212%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%237a8794%22%3EOriginal%20celebration%20art%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E"
+    }
+  ],
+  "chores": [],
+  "completions": [
+    {
+      "id": "a03a2d9e-212f-4b7a-b6a9-0c525080d617",
+      "itemType": "routineStep",
+      "itemId": "0ded719e-b385-4972-adee-ca7e16b48e38",
+      "childProfileId": "7a2494e8-2b60-43f6-a387-d9f8c26fd068",
+      "parentEntityType": "routine",
+      "parentEntityId": "2db3d20c-e72b-425c-9e61-6c05dc9f7280",
+      "status": "completed",
+      "recordedBy": {
+        "role": "childDisplay",
+        "id": "tablet-1"
+      },
+      "completedAt": "2026-04-26T18:47:46.185Z"
+    },
+    {
+      "id": "a8b87069-91bd-420d-ab53-3f97baa29365",
+      "itemType": "routineStep",
+      "itemId": "7f617069-2c57-4c94-a008-ddfb92be8173",
+      "childProfileId": "7a2494e8-2b60-43f6-a387-d9f8c26fd068",
+      "parentEntityType": "routine",
+      "parentEntityId": "b26a8a40-c7b6-42fa-89a2-748116ffdce5",
+      "status": "completed",
+      "recordedBy": {
+        "role": "childDisplay",
+        "id": "tablet-1"
+      },
+      "completedAt": "2026-04-26T18:48:03.112Z"
+    },
+    {
+      "id": "b2d16dd8-02e7-4527-9e1b-b4b8ef025c7b",
+      "itemType": "routineStep",
+      "itemId": "7f617069-2c57-4c94-a008-ddfb92be8173",
+      "childProfileId": "7a2494e8-2b60-43f6-a387-d9f8c26fd068",
+      "scheduledDay": "sunday",
+      "parentEntityType": "routine",
+      "parentEntityId": "b26a8a40-c7b6-42fa-89a2-748116ffdce5",
+      "status": "completed",
+      "recordedBy": {
+        "role": "childDisplay",
+        "id": "tablet-1"
+      },
+      "completedAt": "2026-04-27T03:57:41.279Z"
+    },
+    {
+      "id": "d71caf6e-5a39-4304-b7c1-922b9ce3acbb",
+      "itemType": "routineStep",
+      "itemId": "0ded719e-b385-4972-adee-ca7e16b48e38",
+      "childProfileId": "7a2494e8-2b60-43f6-a387-d9f8c26fd068",
+      "scheduledDay": "sunday",
+      "parentEntityType": "routine",
+      "parentEntityId": "2db3d20c-e72b-425c-9e61-6c05dc9f7280",
+      "status": "completed",
+      "recordedBy": {
+        "role": "childDisplay",
+        "id": "tablet-1"
+      },
+      "completedAt": "2026-04-27T03:57:43.164Z"
+    },
+    {
+      "id": "742a3a0c-0573-4933-9f08-a28668ffc7eb",
+      "itemType": "routineStep",
+      "itemId": "f4152813-1e78-41a5-ac1c-d8092ff44b1b",
+      "childProfileId": "23306dc1-8f5f-4cb8-9349-0c00c62ba9f1",
+      "scheduledDay": "monday",
+      "parentEntityType": "routine",
+      "parentEntityId": "b26a8a40-c7b6-42fa-89a2-748116ffdce5",
+      "status": "completed",
+      "recordedBy": {
+        "role": "childDisplay",
+        "id": "tablet-1"
+      },
+      "completedAt": "2026-04-27T18:32:18.253Z"
+    },
+    {
+      "id": "a3e8506f-5871-474e-948c-73399cbd1e59",
+      "itemType": "routine",
+      "itemId": "2db3d20c-e72b-425c-9e61-6c05dc9f7280",
+      "childProfileId": "7a2494e8-2b60-43f6-a387-d9f8c26fd068",
+      "scheduledDay": "monday",
+      "parentEntityType": "routine",
+      "parentEntityId": "2db3d20c-e72b-425c-9e61-6c05dc9f7280",
+      "status": "completed",
+      "recordedBy": {
+        "role": "parentAdmin",
+        "id": "parent-1"
+      },
+      "completedAt": "2026-04-28T04:18:11.693Z"
+    },
+    {
+      "id": "2af2832b-c07c-425c-a390-948fc5941632",
+      "itemType": "routine",
+      "itemId": "b26a8a40-c7b6-42fa-89a2-748116ffdce5",
+      "childProfileId": "7a2494e8-2b60-43f6-a387-d9f8c26fd068",
+      "scheduledDay": "monday",
+      "parentEntityType": "routine",
+      "parentEntityId": "b26a8a40-c7b6-42fa-89a2-748116ffdce5",
+      "status": "completed",
+      "recordedBy": {
+        "role": "parentAdmin",
+        "id": "parent-1"
+      },
+      "completedAt": "2026-04-28T04:31:58.649Z"
+    },
+    {
+      "id": "7307beef-c0e4-4f26-86ab-29d41f4bee27",
+      "itemType": "routine",
+      "itemId": "b26a8a40-c7b6-42fa-89a2-748116ffdce5",
+      "childProfileId": "7a2494e8-2b60-43f6-a387-d9f8c26fd068",
+      "scheduledDay": "tuesday",
+      "parentEntityType": "routine",
+      "parentEntityId": "b26a8a40-c7b6-42fa-89a2-748116ffdce5",
+      "status": "completed",
+      "recordedBy": {
+        "role": "parentAdmin",
+        "id": "parent-1"
+      },
+      "completedAt": "2026-04-29T01:02:13.944Z"
+    },
+    {
+      "id": "d8b481f1-07f7-4760-9759-17737b74a198",
+      "itemType": "routine",
+      "itemId": "2db3d20c-e72b-425c-9e61-6c05dc9f7280",
+      "childProfileId": "7a2494e8-2b60-43f6-a387-d9f8c26fd068",
+      "scheduledDay": "tuesday",
+      "parentEntityType": "routine",
+      "parentEntityId": "2db3d20c-e72b-425c-9e61-6c05dc9f7280",
+      "status": "completed",
+      "recordedBy": {
+        "role": "parentAdmin",
+        "id": "parent-1"
+      },
+      "completedAt": "2026-04-29T01:02:37.490Z"
+    }
+  ],
+  "rewards": []
+}

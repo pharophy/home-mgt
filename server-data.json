@@ -1,0 +1,1030 @@
+{
+  "schemaVersion": 1,
+  "householdRoles": {
+    "parentAdmins": [
+      "parent-1"
+    ]
+  },
+  "householdSettings": {
+    "celebrationMode": "full"
+  },
+  "childProfiles": [
+    {
+      "id": "dab91eaa-5cff-46b5-9869-d8d6a7a5c05d",
+      "name": "Milo",
+      "avatarUrl": "https://example.com/milo.png",
+      "color": "#F59E0B",
+      "motivators": [
+        "race cars",
+        "energetic blue cartoon dogs"
+      ],
+      "createdAt": "2026-04-27T04:01:19.979Z",
+      "updatedAt": "2026-04-27T04:01:19.979Z"
+    },
+    {
+      "id": "b287d404-7256-42fc-944c-9e6a04db83ae",
+      "name": "Milo",
+      "color": "#F59E0B",
+      "motivators": [],
+      "createdAt": "2026-04-27T04:01:27.354Z",
+      "updatedAt": "2026-04-27T04:01:27.354Z"
+    },
+    {
+      "id": "5f147b2c-ac20-42d3-99b0-bdd6eafe9e04",
+      "name": "Milo",
+      "avatarUrl": "https://example.com/milo.png",
+      "color": "#F59E0B",
+      "motivators": [
+        "race cars",
+        "energetic blue cartoon dogs"
+      ],
+      "createdAt": "2026-04-27T04:01:55.185Z",
+      "updatedAt": "2026-04-27T04:01:55.185Z"
+    },
+    {
+      "id": "161514ae-5fa1-4e52-b6f9-a8edc192f0ed",
+      "name": "Milo",
+      "color": "#F59E0B",
+      "motivators": [],
+      "createdAt": "2026-04-27T04:01:56.757Z",
+      "updatedAt": "2026-04-27T04:01:56.757Z"
+    },
+    {
+      "id": "9e6cc38b-53e0-4acc-8566-0084b93cb064",
+      "name": "Milo",
+      "avatarUrl": "https://example.com/milo.png",
+      "color": "#F59E0B",
+      "motivators": [
+        "race cars",
+        "energetic blue cartoon dogs"
+      ],
+      "createdAt": "2026-04-27T04:02:29.310Z",
+      "updatedAt": "2026-04-27T04:02:29.310Z"
+    },
+    {
+      "id": "4f517199-f68b-450c-9017-8f7de48a5678",
+      "name": "Milo",
+      "color": "#F59E0B",
+      "motivators": [],
+      "createdAt": "2026-04-27T04:02:30.051Z",
+      "updatedAt": "2026-04-27T04:02:30.051Z"
+    },
+    {
+      "id": "a3a2b391-55c8-45be-b1d1-a2a7f940de0b",
+      "name": "Milo",
+      "avatarUrl": "https://example.com/milo.png",
+      "color": "#F59E0B",
+      "motivators": [
+        "race cars",
+        "energetic blue cartoon dogs"
+      ],
+      "createdAt": "2026-04-27T15:32:07.314Z",
+      "updatedAt": "2026-04-27T15:32:07.314Z"
+    },
+    {
+      "id": "2e387ab1-5adc-46f8-8a96-3cfd0c526f28",
+      "name": "Milo",
+      "color": "#F59E0B",
+      "motivators": [],
+      "createdAt": "2026-04-27T15:32:08.103Z",
+      "updatedAt": "2026-04-27T15:32:08.103Z"
+    },
+    {
+      "id": "fc4ce507-3971-4577-b4dc-46669105c8dc",
+      "name": "Milo",
+      "avatarUrl": "https://example.com/milo.png",
+      "color": "#F59E0B",
+      "motivators": [
+        "race cars",
+        "energetic blue cartoon dogs"
+      ],
+      "createdAt": "2026-04-27T16:01:04.916Z",
+      "updatedAt": "2026-04-27T16:01:04.916Z"
+    },
+    {
+      "id": "f1cb4767-d986-4249-96f5-ec384778a124",
+      "name": "Milo",
+      "color": "#F59E0B",
+      "motivators": [],
+      "createdAt": "2026-04-27T16:01:05.640Z",
+      "updatedAt": "2026-04-27T16:01:05.640Z"
+    },
+    {
+      "id": "065caf80-847d-499f-ae2d-5483101365e2",
+      "name": "Milo",
+      "avatarUrl": "https://example.com/milo.png",
+      "color": "#F59E0B",
+      "motivators": [
+        "race cars",
+        "energetic blue cartoon dogs"
+      ],
+      "createdAt": "2026-04-27T16:01:33.399Z",
+      "updatedAt": "2026-04-27T16:01:33.399Z"
+    },
+    {
+      "id": "e9ead96e-5eb7-47eb-a9ec-3bf6e0768195",
+      "name": "Milo",
+      "color": "#F59E0B",
+      "motivators": [],
+      "createdAt": "2026-04-27T16:01:34.157Z",
+      "updatedAt": "2026-04-27T16:01:34.157Z"
+    },
+    {
+      "id": "1d07afaa-6846-4082-8467-eac8707927f8",
+      "name": "Milo",
+      "avatarUrl": "https://example.com/milo.png",
+      "color": "#F59E0B",
+      "motivators": [
+        "race cars",
+        "energetic blue cartoon dogs"
+      ],
+      "createdAt": "2026-04-28T03:44:47.073Z",
+      "updatedAt": "2026-04-28T03:44:47.073Z"
+    },
+    {
+      "id": "eefde676-fc88-4e35-a729-a6a2f709ba51",
+      "name": "Milo",
+      "color": "#F59E0B",
+      "motivators": [],
+      "createdAt": "2026-04-28T03:44:54.448Z",
+      "updatedAt": "2026-04-28T03:44:54.448Z"
+    },
+    {
+      "id": "b7eeb194-0dd9-45e9-8058-330f34bdc9b1",
+      "name": "Milo",
+      "avatarUrl": "https://example.com/milo.png",
+      "color": "#F59E0B",
+      "motivators": [
+        "race cars",
+        "energetic blue cartoon dogs"
+      ],
+      "createdAt": "2026-04-28T03:45:20.418Z",
+      "updatedAt": "2026-04-28T03:45:20.418Z"
+    },
+    {
+      "id": "3eb68d6f-a70b-44fa-85f2-486659eb6089",
+      "name": "Milo",
+      "color": "#F59E0B",
+      "motivators": [],
+      "createdAt": "2026-04-28T03:45:21.160Z",
+      "updatedAt": "2026-04-28T03:45:21.160Z"
+    },
+    {
+      "id": "a0aa283e-f78a-48b7-b87f-fefbdb25b8fa",
+      "name": "Milo",
+      "avatarUrl": "https://example.com/milo.png",
+      "color": "#F59E0B",
+      "motivators": [
+        "race cars",
+        "energetic blue cartoon dogs"
+      ],
+      "createdAt": "2026-04-28T04:02:33.059Z",
+      "updatedAt": "2026-04-28T04:02:33.059Z"
+    },
+    {
+      "id": "225f2ff9-ac2f-4688-b46b-a5ec4fbb2d25",
+      "name": "Milo",
+      "color": "#F59E0B",
+      "motivators": [],
+      "createdAt": "2026-04-28T04:02:33.788Z",
+      "updatedAt": "2026-04-28T04:02:33.788Z"
+    },
+    {
+      "id": "180180ac-ce0a-42d5-8667-7d899c481ada",
+      "name": "Milo",
+      "avatarUrl": "https://example.com/milo.png",
+      "color": "#F59E0B",
+      "motivators": [
+        "race cars",
+        "energetic blue cartoon dogs"
+      ],
+      "createdAt": "2026-04-28T04:08:40.016Z",
+      "updatedAt": "2026-04-28T04:08:40.016Z"
+    },
+    {
+      "id": "21d4393d-b29a-4645-935b-3fd9e8c93b3d",
+      "name": "Milo",
+      "color": "#F59E0B",
+      "motivators": [],
+      "createdAt": "2026-04-28T04:08:40.756Z",
+      "updatedAt": "2026-04-28T04:08:40.756Z"
+    },
+    {
+      "id": "aebcb477-fd75-4d96-938b-db6b3e48a533",
+      "name": "Milo",
+      "avatarUrl": "https://example.com/milo.png",
+      "color": "#F59E0B",
+      "motivators": [
+        "race cars",
+        "energetic blue cartoon dogs"
+      ],
+      "createdAt": "2026-04-28T04:18:14.084Z",
+      "updatedAt": "2026-04-28T04:18:14.084Z"
+    },
+    {
+      "id": "e8ca6dcc-2c6d-409a-a05f-a4067471e6f6",
+      "name": "Milo",
+      "color": "#F59E0B",
+      "motivators": [],
+      "createdAt": "2026-04-28T04:19:15.352Z",
+      "updatedAt": "2026-04-28T04:19:15.352Z"
+    },
+    {
+      "id": "8b6ba7f6-27bc-4b09-b5f6-492ebf8dfeea",
+      "name": "Milo",
+      "avatarUrl": "https://example.com/milo.png",
+      "color": "#F59E0B",
+      "motivators": [
+        "race cars",
+        "energetic blue cartoon dogs"
+      ],
+      "createdAt": "2026-04-28T04:19:36.596Z",
+      "updatedAt": "2026-04-28T04:19:36.596Z"
+    },
+    {
+      "id": "566aae92-e51d-40f1-a6ea-d53cbd8bd27a",
+      "name": "Milo",
+      "color": "#F59E0B",
+      "motivators": [],
+      "createdAt": "2026-04-28T04:19:37.336Z",
+      "updatedAt": "2026-04-28T04:19:37.336Z"
+    },
+    {
+      "id": "79ee4cc9-b2da-4bc4-8241-c483e4960efa",
+      "name": "SQL Probe Child",
+      "color": "#123456",
+      "motivators": [
+        "cars"
+      ],
+      "createdAt": "2026-04-29T02:18:07.974Z",
+      "updatedAt": "2026-04-29T02:18:07.974Z"
+    },
+    {
+      "id": "729d571c-cc0c-4ced-91a8-73ed7b8ea3bf",
+      "name": "SQL Probe Child 2",
+      "color": "#654321",
+      "motivators": [
+        "race cars"
+      ],
+      "createdAt": "2026-04-29T02:18:29.143Z",
+      "updatedAt": "2026-04-29T02:18:29.143Z"
+    }
+  ],
+  "routines": [
+    {
+      "id": "a1c176ab-6ff8-4c7d-9afe-d2d097371c9e",
+      "childProfileId": "b287d404-7256-42fc-944c-9e6a04db83ae",
+      "name": "Morning helper",
+      "schedule": {
+        "days": [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday"
+        ]
+      },
+      "steps": [
+        {
+          "id": "3f04eae2-6645-4bdf-b818-75fccb50a7cc",
+          "label": "Get dressed",
+          "order": 0
+        }
+      ],
+      "createdAt": "2026-04-27T04:01:27.704Z",
+      "updatedAt": "2026-04-27T04:01:27.704Z"
+    },
+    {
+      "id": "d2cb3f11-af38-401b-a22c-bd9156bb55f4",
+      "childProfileId": "4f517199-f68b-450c-9017-8f7de48a5678",
+      "name": "Morning helper",
+      "schedule": {
+        "days": [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday"
+        ]
+      },
+      "steps": [
+        {
+          "id": "4c0001a5-ef44-49cc-91ac-791f1cd68e48",
+          "label": "Get dressed",
+          "order": 0
+        }
+      ],
+      "createdAt": "2026-04-27T04:02:30.456Z",
+      "updatedAt": "2026-04-27T04:02:30.456Z"
+    },
+    {
+      "id": "c7ac4fc4-1c9b-404e-a9e7-5d6b635214ae",
+      "childProfileId": "2e387ab1-5adc-46f8-8a96-3cfd0c526f28",
+      "name": "Morning helper",
+      "schedule": {
+        "days": [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday"
+        ]
+      },
+      "steps": [
+        {
+          "id": "cd6ed403-f9d6-4f84-a470-7f0f99407c29",
+          "label": "Get dressed",
+          "order": 0
+        }
+      ],
+      "createdAt": "2026-04-27T15:32:08.450Z",
+      "updatedAt": "2026-04-27T15:32:08.450Z"
+    },
+    {
+      "id": "f473e7c7-441d-4474-980d-ddfb7f0cc703",
+      "childProfileId": "f1cb4767-d986-4249-96f5-ec384778a124",
+      "name": "Morning helper",
+      "schedule": {
+        "days": [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday"
+        ]
+      },
+      "steps": [
+        {
+          "id": "bc334b33-93b6-4c9c-a824-7126c7ec0452",
+          "label": "Get dressed",
+          "order": 0
+        }
+      ],
+      "createdAt": "2026-04-27T16:01:06.039Z",
+      "updatedAt": "2026-04-27T16:01:06.039Z"
+    },
+    {
+      "id": "7704b440-606d-4391-a3e4-918ae521f779",
+      "childProfileId": "e9ead96e-5eb7-47eb-a9ec-3bf6e0768195",
+      "name": "Morning helper",
+      "schedule": {
+        "days": [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday"
+        ]
+      },
+      "steps": [
+        {
+          "id": "ee4f390b-94ac-4bb1-945e-0f57fb9467b6",
+          "label": "Get dressed",
+          "order": 0
+        }
+      ],
+      "createdAt": "2026-04-27T16:01:34.506Z",
+      "updatedAt": "2026-04-27T16:01:34.506Z"
+    },
+    {
+      "id": "d6de73fc-f68f-4a3c-a5c6-7a2dded86403",
+      "childProfileId": "eefde676-fc88-4e35-a729-a6a2f709ba51",
+      "name": "Morning helper",
+      "schedule": {
+        "days": [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday"
+        ]
+      },
+      "steps": [
+        {
+          "id": "e7f91189-a366-417c-a4b6-65975e4d6505",
+          "label": "Get dressed",
+          "order": 0
+        }
+      ],
+      "createdAt": "2026-04-28T03:44:54.812Z",
+      "updatedAt": "2026-04-28T03:44:54.812Z"
+    },
+    {
+      "id": "cbbc7252-174f-4adb-82a1-37f2f6080280",
+      "childProfileId": "3eb68d6f-a70b-44fa-85f2-486659eb6089",
+      "name": "Morning helper",
+      "schedule": {
+        "days": [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday"
+        ]
+      },
+      "steps": [
+        {
+          "id": "5b40f386-16c6-47c7-9c3e-8ebd831a597f",
+          "label": "Get dressed",
+          "order": 0
+        }
+      ],
+      "createdAt": "2026-04-28T03:45:21.563Z",
+      "updatedAt": "2026-04-28T03:45:21.563Z"
+    },
+    {
+      "id": "273031f4-8b82-450d-9a84-dd9dd196ac65",
+      "childProfileId": "225f2ff9-ac2f-4688-b46b-a5ec4fbb2d25",
+      "name": "Morning helper",
+      "schedule": {
+        "days": [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday"
+        ]
+      },
+      "steps": [
+        {
+          "id": "eec1c817-7cc3-4d40-8b1b-d820ea53b8d5",
+          "label": "Get dressed",
+          "order": 0
+        }
+      ],
+      "createdAt": "2026-04-28T04:02:34.134Z",
+      "updatedAt": "2026-04-28T04:02:34.134Z"
+    },
+    {
+      "id": "44299c1c-4b39-4824-80eb-1d5116df249b",
+      "childProfileId": "21d4393d-b29a-4645-935b-3fd9e8c93b3d",
+      "name": "Morning helper",
+      "schedule": {
+        "days": [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday"
+        ]
+      },
+      "steps": [
+        {
+          "id": "dae01c08-43c1-4099-8006-1d64bd662ef3",
+          "label": "Get dressed",
+          "order": 0
+        }
+      ],
+      "createdAt": "2026-04-28T04:08:41.123Z",
+      "updatedAt": "2026-04-28T04:08:41.123Z"
+    },
+    {
+      "id": "0943be4a-aecd-4f5a-9199-2d12a8c17329",
+      "childProfileId": "e8ca6dcc-2c6d-409a-a05f-a4067471e6f6",
+      "name": "Morning helper",
+      "schedule": {
+        "days": [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday"
+        ]
+      },
+      "steps": [
+        {
+          "id": "a04beb7a-f634-420a-8f6b-b858123f73be",
+          "label": "Get dressed",
+          "order": 0
+        }
+      ],
+      "createdAt": "2026-04-28T04:19:15.715Z",
+      "updatedAt": "2026-04-28T04:19:15.715Z"
+    },
+    {
+      "id": "9d7865e5-6deb-48f5-a9f0-b8c259e572b6",
+      "childProfileId": "566aae92-e51d-40f1-a6ea-d53cbd8bd27a",
+      "name": "Morning helper",
+      "schedule": {
+        "days": [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday"
+        ]
+      },
+      "steps": [
+        {
+          "id": "8d592d3d-ffb1-4805-ae21-678830ffde79",
+          "label": "Get dressed",
+          "order": 0
+        }
+      ],
+      "createdAt": "2026-04-28T04:19:37.669Z",
+      "updatedAt": "2026-04-28T04:19:37.669Z"
+    }
+  ],
+  "chores": [
+    {
+      "id": "9164eaa6-82e2-4b5c-82bd-a406bd5f3527",
+      "childProfileId": "dab91eaa-5cff-46b5-9869-d8d6a7a5c05d",
+      "name": "Carry napkins",
+      "imageUrl": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22320%22%20height%3D%22200%22%20viewBox%3D%220%200%20320%20200%22%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%22320%22%20height%3D%22200%22%20rx%3D%2224%22%20fill%3D%22%23e8f6ef%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%2256%22%20cy%3D%2246%22%20r%3D%2218%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.35%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%22270%22%20cy%3D%2254%22%20r%3D%2214%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.22%22%20%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%2288%22%20font-size%3D%2218%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23243042%22%3ECarry%20napkins%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22122%22%20font-size%3D%2214%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23526173%22%3EInspired%20by%20%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22156%22%20font-size%3D%2212%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%237a8794%22%3EOriginal%20celebration%20art%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E",
+      "recurrence": {
+        "days": [
+          "monday"
+        ]
+      },
+      "requiresApproval": false,
+      "createdAt": "2026-04-27T04:01:20.339Z",
+      "updatedAt": "2026-04-27T04:01:20.339Z"
+    },
+    {
+      "id": "e1791dec-9cb1-4ee1-aba2-c0bd588973f3",
+      "childProfileId": "9e6cc38b-53e0-4acc-8566-0084b93cb064",
+      "name": "Carry napkins",
+      "imageUrl": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22320%22%20height%3D%22200%22%20viewBox%3D%220%200%20320%20200%22%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%22320%22%20height%3D%22200%22%20rx%3D%2224%22%20fill%3D%22%23e8f6ef%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%2256%22%20cy%3D%2246%22%20r%3D%2218%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.35%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%22270%22%20cy%3D%2254%22%20r%3D%2214%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.22%22%20%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%2288%22%20font-size%3D%2218%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23243042%22%3ECarry%20napkins%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22122%22%20font-size%3D%2214%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23526173%22%3EInspired%20by%20%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22156%22%20font-size%3D%2212%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%237a8794%22%3EOriginal%20celebration%20art%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E",
+      "recurrence": {
+        "days": [
+          "monday"
+        ]
+      },
+      "requiresApproval": false,
+      "createdAt": "2026-04-27T04:02:29.670Z",
+      "updatedAt": "2026-04-27T04:02:29.670Z"
+    },
+    {
+      "id": "dc8d6d58-8c8d-432b-8d0f-1003bfe026e2",
+      "childProfileId": "a3a2b391-55c8-45be-b1d1-a2a7f940de0b",
+      "name": "Carry napkins",
+      "imageUrl": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22320%22%20height%3D%22200%22%20viewBox%3D%220%200%20320%20200%22%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%22320%22%20height%3D%22200%22%20rx%3D%2224%22%20fill%3D%22%23e8f6ef%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%2256%22%20cy%3D%2246%22%20r%3D%2218%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.35%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%22270%22%20cy%3D%2254%22%20r%3D%2214%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.22%22%20%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%2288%22%20font-size%3D%2218%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23243042%22%3ECarry%20napkins%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22122%22%20font-size%3D%2214%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23526173%22%3EInspired%20by%20%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22156%22%20font-size%3D%2212%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%237a8794%22%3EOriginal%20celebration%20art%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E",
+      "recurrence": {
+        "days": [
+          "monday"
+        ]
+      },
+      "requiresApproval": false,
+      "createdAt": "2026-04-27T15:32:07.703Z",
+      "updatedAt": "2026-04-27T15:32:07.703Z"
+    },
+    {
+      "id": "f71f2939-8ee3-47c7-9a1a-259fc4cc4990",
+      "childProfileId": "fc4ce507-3971-4577-b4dc-46669105c8dc",
+      "name": "Carry napkins",
+      "imageUrl": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22320%22%20height%3D%22200%22%20viewBox%3D%220%200%20320%20200%22%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%22320%22%20height%3D%22200%22%20rx%3D%2224%22%20fill%3D%22%23e8f6ef%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%2256%22%20cy%3D%2246%22%20r%3D%2218%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.35%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%22270%22%20cy%3D%2254%22%20r%3D%2214%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.22%22%20%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%2288%22%20font-size%3D%2218%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23243042%22%3ECarry%20napkins%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22122%22%20font-size%3D%2214%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23526173%22%3EInspired%20by%20%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22156%22%20font-size%3D%2212%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%237a8794%22%3EOriginal%20celebration%20art%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E",
+      "recurrence": {
+        "days": [
+          "monday"
+        ]
+      },
+      "requiresApproval": false,
+      "createdAt": "2026-04-27T16:01:05.279Z",
+      "updatedAt": "2026-04-27T16:01:05.279Z"
+    },
+    {
+      "id": "6c7273cc-b1e1-4c7f-ac3c-10333877a1d5",
+      "childProfileId": "065caf80-847d-499f-ae2d-5483101365e2",
+      "name": "Carry napkins",
+      "imageUrl": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22320%22%20height%3D%22200%22%20viewBox%3D%220%200%20320%20200%22%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%22320%22%20height%3D%22200%22%20rx%3D%2224%22%20fill%3D%22%23e8f6ef%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%2256%22%20cy%3D%2246%22%20r%3D%2218%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.35%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%22270%22%20cy%3D%2254%22%20r%3D%2214%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.22%22%20%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%2288%22%20font-size%3D%2218%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23243042%22%3ECarry%20napkins%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22122%22%20font-size%3D%2214%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23526173%22%3EInspired%20by%20%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22156%22%20font-size%3D%2212%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%237a8794%22%3EOriginal%20celebration%20art%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E",
+      "recurrence": {
+        "days": [
+          "monday"
+        ]
+      },
+      "requiresApproval": false,
+      "createdAt": "2026-04-27T16:01:33.775Z",
+      "updatedAt": "2026-04-27T16:01:33.775Z"
+    },
+    {
+      "id": "3a7b2168-23e8-4728-81ad-9a85d8810a1f",
+      "childProfileId": "1d07afaa-6846-4082-8467-eac8707927f8",
+      "name": "Carry napkins",
+      "imageUrl": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22320%22%20height%3D%22200%22%20viewBox%3D%220%200%20320%20200%22%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%22320%22%20height%3D%22200%22%20rx%3D%2224%22%20fill%3D%22%23e8f6ef%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%2256%22%20cy%3D%2246%22%20r%3D%2218%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.35%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%22270%22%20cy%3D%2254%22%20r%3D%2214%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.22%22%20%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%2288%22%20font-size%3D%2218%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23243042%22%3ECarry%20napkins%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22122%22%20font-size%3D%2214%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23526173%22%3EInspired%20by%20%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22156%22%20font-size%3D%2212%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%237a8794%22%3EOriginal%20celebration%20art%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E",
+      "recurrence": {
+        "days": [
+          "monday"
+        ]
+      },
+      "requiresApproval": false,
+      "createdAt": "2026-04-28T03:44:47.479Z",
+      "updatedAt": "2026-04-28T03:44:47.479Z"
+    },
+    {
+      "id": "2148f425-a986-4b42-819c-a60a9bcfae6f",
+      "childProfileId": "b7eeb194-0dd9-45e9-8058-330f34bdc9b1",
+      "name": "Carry napkins",
+      "imageUrl": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22320%22%20height%3D%22200%22%20viewBox%3D%220%200%20320%20200%22%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%22320%22%20height%3D%22200%22%20rx%3D%2224%22%20fill%3D%22%23e8f6ef%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%2256%22%20cy%3D%2246%22%20r%3D%2218%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.35%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%22270%22%20cy%3D%2254%22%20r%3D%2214%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.22%22%20%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%2288%22%20font-size%3D%2218%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23243042%22%3ECarry%20napkins%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22122%22%20font-size%3D%2214%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23526173%22%3EInspired%20by%20%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22156%22%20font-size%3D%2212%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%237a8794%22%3EOriginal%20celebration%20art%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E",
+      "recurrence": {
+        "days": [
+          "monday"
+        ]
+      },
+      "requiresApproval": false,
+      "createdAt": "2026-04-28T03:45:20.775Z",
+      "updatedAt": "2026-04-28T03:45:20.775Z"
+    },
+    {
+      "id": "4b5d11e5-aaa0-4b69-a164-803c1be7eeb9",
+      "childProfileId": "a0aa283e-f78a-48b7-b87f-fefbdb25b8fa",
+      "name": "Carry napkins",
+      "imageUrl": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22320%22%20height%3D%22200%22%20viewBox%3D%220%200%20320%20200%22%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%22320%22%20height%3D%22200%22%20rx%3D%2224%22%20fill%3D%22%23e8f6ef%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%2256%22%20cy%3D%2246%22%20r%3D%2218%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.35%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%22270%22%20cy%3D%2254%22%20r%3D%2214%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.22%22%20%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%2288%22%20font-size%3D%2218%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23243042%22%3ECarry%20napkins%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22122%22%20font-size%3D%2214%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23526173%22%3EInspired%20by%20%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22156%22%20font-size%3D%2212%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%237a8794%22%3EOriginal%20celebration%20art%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E",
+      "recurrence": {
+        "days": [
+          "monday"
+        ]
+      },
+      "requiresApproval": false,
+      "createdAt": "2026-04-28T04:02:33.404Z",
+      "updatedAt": "2026-04-28T04:02:33.404Z"
+    },
+    {
+      "id": "6f764356-10a9-4ed2-a0bf-8eb2eb37a032",
+      "childProfileId": "180180ac-ce0a-42d5-8667-7d899c481ada",
+      "name": "Carry napkins",
+      "imageUrl": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22320%22%20height%3D%22200%22%20viewBox%3D%220%200%20320%20200%22%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%22320%22%20height%3D%22200%22%20rx%3D%2224%22%20fill%3D%22%23e8f6ef%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%2256%22%20cy%3D%2246%22%20r%3D%2218%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.35%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%22270%22%20cy%3D%2254%22%20r%3D%2214%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.22%22%20%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%2288%22%20font-size%3D%2218%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23243042%22%3ECarry%20napkins%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22122%22%20font-size%3D%2214%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23526173%22%3EInspired%20by%20%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22156%22%20font-size%3D%2212%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%237a8794%22%3EOriginal%20celebration%20art%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E",
+      "recurrence": {
+        "days": [
+          "monday"
+        ]
+      },
+      "requiresApproval": false,
+      "createdAt": "2026-04-28T04:08:40.374Z",
+      "updatedAt": "2026-04-28T04:08:40.374Z"
+    },
+    {
+      "id": "508e3fcd-c28b-4299-af19-949a030d9189",
+      "childProfileId": "aebcb477-fd75-4d96-938b-db6b3e48a533",
+      "name": "Carry napkins",
+      "imageUrl": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22320%22%20height%3D%22200%22%20viewBox%3D%220%200%20320%20200%22%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%22320%22%20height%3D%22200%22%20rx%3D%2224%22%20fill%3D%22%23e8f6ef%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%2256%22%20cy%3D%2246%22%20r%3D%2218%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.35%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%22270%22%20cy%3D%2254%22%20r%3D%2214%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.22%22%20%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%2288%22%20font-size%3D%2218%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23243042%22%3ECarry%20napkins%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22122%22%20font-size%3D%2214%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23526173%22%3EInspired%20by%20%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22156%22%20font-size%3D%2212%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%237a8794%22%3EOriginal%20celebration%20art%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E",
+      "recurrence": {
+        "days": [
+          "monday"
+        ]
+      },
+      "requiresApproval": false,
+      "createdAt": "2026-04-28T04:18:14.437Z",
+      "updatedAt": "2026-04-28T04:18:14.437Z"
+    },
+    {
+      "id": "ab893740-50ae-48c0-b81c-70508d6b4606",
+      "childProfileId": "8b6ba7f6-27bc-4b09-b5f6-492ebf8dfeea",
+      "name": "Carry napkins",
+      "imageUrl": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22320%22%20height%3D%22200%22%20viewBox%3D%220%200%20320%20200%22%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%22320%22%20height%3D%22200%22%20rx%3D%2224%22%20fill%3D%22%23e8f6ef%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%2256%22%20cy%3D%2246%22%20r%3D%2218%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.35%22%20%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%22270%22%20cy%3D%2254%22%20r%3D%2214%22%20fill%3D%22%2358a27c%22%20opacity%3D%220.22%22%20%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%2288%22%20font-size%3D%2218%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23243042%22%3ECarry%20napkins%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22122%22%20font-size%3D%2214%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%23526173%22%3EInspired%20by%20%3C%2Ftext%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2224%22%20y%3D%22156%22%20font-size%3D%2212%22%20font-family%3D%22Arial%2C%20sans-serif%22%20fill%3D%22%237a8794%22%3EOriginal%20celebration%20art%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E",
+      "recurrence": {
+        "days": [
+          "monday"
+        ]
+      },
+      "requiresApproval": false,
+      "createdAt": "2026-04-28T04:19:36.950Z",
+      "updatedAt": "2026-04-28T04:19:36.950Z"
+    },
+    {
+      "id": "6e448f92-dbbd-4164-92e8-f4f5edcdba80",
+      "childProfileId": "729d571c-cc0c-4ced-91a8-73ed7b8ea3bf",
+      "name": "Probe chore",
+      "recurrence": {
+        "days": [
+          "tuesday"
+        ]
+      },
+      "requiresApproval": false,
+      "createdAt": "2026-04-29T02:18:29.152Z",
+      "updatedAt": "2026-04-29T02:18:29.152Z"
+    }
+  ],
+  "completions": [
+    {
+      "id": "616fba4b-7b7f-4978-b674-ad021795b13b",
+      "itemType": "chore",
+      "itemId": "9164eaa6-82e2-4b5c-82bd-a406bd5f3527",
+      "childProfileId": "dab91eaa-5cff-46b5-9869-d8d6a7a5c05d",
+      "scheduledDay": "monday",
+      "status": "completed",
+      "recordedBy": {
+        "role": "parentAdmin",
+        "id": "parent-1"
+      },
+      "completedAt": "2026-04-27T04:01:20.436Z"
+    },
+    {
+      "id": "c3fd82a0-e462-4d43-ba8a-f154ee7a20e1",
+      "itemType": "routineStep",
+      "itemId": "3f04eae2-6645-4bdf-b818-75fccb50a7cc",
+      "childProfileId": "b287d404-7256-42fc-944c-9e6a04db83ae",
+      "scheduledDay": "sunday",
+      "parentEntityType": "routine",
+      "parentEntityId": "a1c176ab-6ff8-4c7d-9afe-d2d097371c9e",
+      "status": "completed",
+      "recordedBy": {
+        "role": "childDisplay",
+        "id": "tablet-1"
+      },
+      "completedAt": "2026-04-27T04:01:27.784Z"
+    },
+    {
+      "id": "3e65b1a2-194d-418d-81c0-d20336d13326",
+      "itemType": "chore",
+      "itemId": "e1791dec-9cb1-4ee1-aba2-c0bd588973f3",
+      "childProfileId": "9e6cc38b-53e0-4acc-8566-0084b93cb064",
+      "scheduledDay": "monday",
+      "status": "completed",
+      "recordedBy": {
+        "role": "parentAdmin",
+        "id": "parent-1"
+      },
+      "completedAt": "2026-04-27T04:02:29.785Z"
+    },
+    {
+      "id": "afcb1d3f-c956-424a-a15c-dd8904550483",
+      "itemType": "routineStep",
+      "itemId": "4c0001a5-ef44-49cc-91ac-791f1cd68e48",
+      "childProfileId": "4f517199-f68b-450c-9017-8f7de48a5678",
+      "scheduledDay": "sunday",
+      "parentEntityType": "routine",
+      "parentEntityId": "d2cb3f11-af38-401b-a22c-bd9156bb55f4",
+      "status": "completed",
+      "recordedBy": {
+        "role": "childDisplay",
+        "id": "tablet-1"
+      },
+      "completedAt": "2026-04-27T04:02:30.554Z"
+    },
+    {
+      "id": "c63334a4-144e-459c-96ef-b934e196aa42",
+      "itemType": "chore",
+      "itemId": "dc8d6d58-8c8d-432b-8d0f-1003bfe026e2",
+      "childProfileId": "a3a2b391-55c8-45be-b1d1-a2a7f940de0b",
+      "scheduledDay": "monday",
+      "status": "completed",
+      "recordedBy": {
+        "role": "parentAdmin",
+        "id": "parent-1"
+      },
+      "completedAt": "2026-04-27T15:32:07.821Z"
+    },
+    {
+      "id": "a1d4e05e-7392-4793-bae9-c46bfac7d4bb",
+      "itemType": "routineStep",
+      "itemId": "cd6ed403-f9d6-4f84-a470-7f0f99407c29",
+      "childProfileId": "2e387ab1-5adc-46f8-8a96-3cfd0c526f28",
+      "scheduledDay": "monday",
+      "parentEntityType": "routine",
+      "parentEntityId": "c7ac4fc4-1c9b-404e-a9e7-5d6b635214ae",
+      "status": "completed",
+      "recordedBy": {
+        "role": "childDisplay",
+        "id": "tablet-1"
+      },
+      "completedAt": "2026-04-27T15:32:08.534Z"
+    },
+    {
+      "id": "b70ad47f-f421-492e-9cc8-e4de5e391321",
+      "itemType": "chore",
+      "itemId": "f71f2939-8ee3-47c7-9a1a-259fc4cc4990",
+      "childProfileId": "fc4ce507-3971-4577-b4dc-46669105c8dc",
+      "scheduledDay": "monday",
+      "status": "completed",
+      "recordedBy": {
+        "role": "parentAdmin",
+        "id": "parent-1"
+      },
+      "completedAt": "2026-04-27T16:01:05.374Z"
+    },
+    {
+      "id": "d59ecabd-d512-422d-9f1b-49e66736982b",
+      "itemType": "routineStep",
+      "itemId": "bc334b33-93b6-4c9c-a824-7126c7ec0452",
+      "childProfileId": "f1cb4767-d986-4249-96f5-ec384778a124",
+      "scheduledDay": "monday",
+      "parentEntityType": "routine",
+      "parentEntityId": "f473e7c7-441d-4474-980d-ddfb7f0cc703",
+      "status": "completed",
+      "recordedBy": {
+        "role": "childDisplay",
+        "id": "tablet-1"
+      },
+      "completedAt": "2026-04-27T16:01:06.107Z"
+    },
+    {
+      "id": "697123d5-dad2-4faf-8793-37dc948d1c3a",
+      "itemType": "chore",
+      "itemId": "6c7273cc-b1e1-4c7f-ac3c-10333877a1d5",
+      "childProfileId": "065caf80-847d-499f-ae2d-5483101365e2",
+      "scheduledDay": "monday",
+      "status": "completed",
+      "recordedBy": {
+        "role": "parentAdmin",
+        "id": "parent-1"
+      },
+      "completedAt": "2026-04-27T16:01:33.890Z"
+    },
+    {
+      "id": "0a55091f-6147-42bd-935d-ae492be84e00",
+      "itemType": "routineStep",
+      "itemId": "ee4f390b-94ac-4bb1-945e-0f57fb9467b6",
+      "childProfileId": "e9ead96e-5eb7-47eb-a9ec-3bf6e0768195",
+      "scheduledDay": "monday",
+      "parentEntityType": "routine",
+      "parentEntityId": "7704b440-606d-4391-a3e4-918ae521f779",
+      "status": "completed",
+      "recordedBy": {
+        "role": "childDisplay",
+        "id": "tablet-1"
+      },
+      "completedAt": "2026-04-27T16:01:34.592Z"
+    },
+    {
+      "id": "749862b8-5714-41eb-866a-18779816ce1a",
+      "itemType": "chore",
+      "itemId": "3a7b2168-23e8-4728-81ad-9a85d8810a1f",
+      "childProfileId": "1d07afaa-6846-4082-8467-eac8707927f8",
+      "scheduledDay": "monday",
+      "status": "completed",
+      "recordedBy": {
+        "role": "parentAdmin",
+        "id": "parent-1"
+      },
+      "completedAt": "2026-04-28T03:44:47.598Z"
+    },
+    {
+      "id": "21306955-d037-4c6c-a3f1-a0788a717be6",
+      "itemType": "routineStep",
+      "itemId": "e7f91189-a366-417c-a4b6-65975e4d6505",
+      "childProfileId": "eefde676-fc88-4e35-a729-a6a2f709ba51",
+      "scheduledDay": "monday",
+      "parentEntityType": "routine",
+      "parentEntityId": "d6de73fc-f68f-4a3c-a5c6-7a2dded86403",
+      "status": "completed",
+      "recordedBy": {
+        "role": "childDisplay",
+        "id": "tablet-1"
+      },
+      "completedAt": "2026-04-28T03:44:54.894Z"
+    },
+    {
+      "id": "0bcecaeb-2b46-4fa1-9f4a-adffcb30e5bb",
+      "itemType": "chore",
+      "itemId": "2148f425-a986-4b42-819c-a60a9bcfae6f",
+      "childProfileId": "b7eeb194-0dd9-45e9-8058-330f34bdc9b1",
+      "scheduledDay": "monday",
+      "status": "completed",
+      "recordedBy": {
+        "role": "parentAdmin",
+        "id": "parent-1"
+      },
+      "completedAt": "2026-04-28T03:45:20.895Z"
+    },
+    {
+      "id": "b5513c0e-a67b-4f2c-944b-024bf657a93e",
+      "itemType": "routineStep",
+      "itemId": "5b40f386-16c6-47c7-9c3e-8ebd831a597f",
+      "childProfileId": "3eb68d6f-a70b-44fa-85f2-486659eb6089",
+      "scheduledDay": "monday",
+      "parentEntityType": "routine",
+      "parentEntityId": "cbbc7252-174f-4adb-82a1-37f2f6080280",
+      "status": "completed",
+      "recordedBy": {
+        "role": "childDisplay",
+        "id": "tablet-1"
+      },
+      "completedAt": "2026-04-28T03:45:21.641Z"
+    },
+    {
+      "id": "e46e85ab-ec5b-46e6-a969-ef2b1f3ba309",
+      "itemType": "chore",
+      "itemId": "4b5d11e5-aaa0-4b69-a164-803c1be7eeb9",
+      "childProfileId": "a0aa283e-f78a-48b7-b87f-fefbdb25b8fa",
+      "scheduledDay": "monday",
+      "status": "completed",
+      "recordedBy": {
+        "role": "parentAdmin",
+        "id": "parent-1"
+      },
+      "completedAt": "2026-04-28T04:02:33.504Z"
+    },
+    {
+      "id": "230f4361-66c4-4020-8d04-6b152e066862",
+      "itemType": "routineStep",
+      "itemId": "eec1c817-7cc3-4d40-8b1b-d820ea53b8d5",
+      "childProfileId": "225f2ff9-ac2f-4688-b46b-a5ec4fbb2d25",
+      "scheduledDay": "monday",
+      "parentEntityType": "routine",
+      "parentEntityId": "273031f4-8b82-450d-9a84-dd9dd196ac65",
+      "status": "completed",
+      "recordedBy": {
+        "role": "childDisplay",
+        "id": "tablet-1"
+      },
+      "completedAt": "2026-04-28T04:02:34.221Z"
+    },
+    {
+      "id": "37321d0f-d718-4d1f-a9d4-bcb5726ab3f2",
+      "itemType": "chore",
+      "itemId": "6f764356-10a9-4ed2-a0bf-8eb2eb37a032",
+      "childProfileId": "180180ac-ce0a-42d5-8667-7d899c481ada",
+      "scheduledDay": "monday",
+      "status": "completed",
+      "recordedBy": {
+        "role": "parentAdmin",
+        "id": "parent-1"
+      },
+      "completedAt": "2026-04-28T04:08:40.475Z"
+    },
+    {
+      "id": "1fb701c2-ac7b-4ca2-a3fa-46724c3a704a",
+      "itemType": "routineStep",
+      "itemId": "dae01c08-43c1-4099-8006-1d64bd662ef3",
+      "childProfileId": "21d4393d-b29a-4645-935b-3fd9e8c93b3d",
+      "scheduledDay": "monday",
+      "parentEntityType": "routine",
+      "parentEntityId": "44299c1c-4b39-4824-80eb-1d5116df249b",
+      "status": "completed",
+      "recordedBy": {
+        "role": "childDisplay",
+        "id": "tablet-1"
+      },
+      "completedAt": "2026-04-28T04:08:41.205Z"
+    },
+    {
+      "id": "ee98ebd2-18d2-409d-9f1f-905fbbc80e24",
+      "itemType": "routineStep",
+      "itemId": "a04beb7a-f634-420a-8f6b-b858123f73be",
+      "childProfileId": "e8ca6dcc-2c6d-409a-a05f-a4067471e6f6",
+      "scheduledDay": "monday",
+      "parentEntityType": "routine",
+      "parentEntityId": "0943be4a-aecd-4f5a-9199-2d12a8c17329",
+      "status": "completed",
+      "recordedBy": {
+        "role": "childDisplay",
+        "id": "tablet-1"
+      },
+      "completedAt": "2026-04-28T04:19:15.799Z"
+    },
+    {
+      "id": "c8133561-9cc0-4545-9c3f-0d25ccc09b40",
+      "itemType": "chore",
+      "itemId": "ab893740-50ae-48c0-b81c-70508d6b4606",
+      "childProfileId": "8b6ba7f6-27bc-4b09-b5f6-492ebf8dfeea",
+      "scheduledDay": "monday",
+      "status": "completed",
+      "recordedBy": {
+        "role": "parentAdmin",
+        "id": "parent-1"
+      },
+      "completedAt": "2026-04-28T04:19:37.050Z"
+    },
+    {
+      "id": "b4fce195-fd38-4ca3-85b8-089bb449cf87",
+      "itemType": "routineStep",
+      "itemId": "8d592d3d-ffb1-4805-ae21-678830ffde79",
+      "childProfileId": "566aae92-e51d-40f1-a6ea-d53cbd8bd27a",
+      "scheduledDay": "monday",
+      "parentEntityType": "routine",
+      "parentEntityId": "9d7865e5-6deb-48f5-a9f0-b8c259e572b6",
+      "status": "completed",
+      "recordedBy": {
+        "role": "childDisplay",
+        "id": "tablet-1"
+      },
+      "completedAt": "2026-04-28T04:19:37.751Z"
+    },
+    {
+      "id": "2f1c59b0-8a10-4f16-bbce-17acdf15993a",
+      "itemType": "chore",
+      "itemId": "6e448f92-dbbd-4164-92e8-f4f5edcdba80",
+      "childProfileId": "729d571c-cc0c-4ced-91a8-73ed7b8ea3bf",
+      "scheduledDay": "tuesday",
+      "status": "completed",
+      "recordedBy": {
+        "role": "parentAdmin",
+        "id": "parent-1"
+      },
+      "completedAt": "2026-04-29T02:18:29.156Z"
+    }
+  ],
+  "rewards": []
+}
