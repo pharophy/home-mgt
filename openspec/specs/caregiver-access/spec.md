@@ -1,4 +1,9 @@
-## ADDED Requirements
+# caregiver-access Specification
+
+## Purpose
+Define the deferred caregiver access model, including constrained caregiver permissions for running child activities without full household administration.
+
+## Requirements
 
 ### Requirement: Parents can grant caregiver access
 The system SHALL allow a parent to grant a caregiver access to the household participation system with permissions narrower than full administration.

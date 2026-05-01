@@ -1,7 +1,10 @@
-## ADDED Requirements
+# shared-tablet-access Specification
 
+## Purpose
+Define the MVP access model that separates parent/admin setup and review from child-facing tablet execution while deferring caregiver-specific modes.
+## Requirements
 ### Requirement: The MVP SHALL expose only parent/admin and child-facing interaction surfaces
-The system SHALL define the preschool participation MVP around a parent/admin experience for setup and review, and a child-facing tablet experience for execution. The MVP SHALL NOT expose a distinct helper, caregiver, or non-parent adult mode.
+The system SHALL define the preschool participation MVP around a parent/admin experience for setup and review, and a child-facing tablet experience for execution. The MVP SHALL NOT expose a distinct helper, caregiver, or non-parent adult mode, and SHALL NOT require tablet mode to occupy a top-level parent workspace slot.
 
 #### Scenario: Parent opens the product for setup
 - **WHEN** an adult opens the MVP to create or manage the child plan
@@ -10,6 +13,7 @@ The system SHALL define the preschool participation MVP around a parent/admin ex
 #### Scenario: Child uses the tablet flow
 - **WHEN** the household opens the child-facing tablet experience
 - **THEN** the system presents a child-safe execution flow without exposing a distinct helper or caregiver mode
+- **THEN** the parent does not need a permanent top-level tablet navigation item in order to reach that flow
 
 ### Requirement: Child-facing execution SHALL remain protected from admin/setup controls
 The system SHALL preserve a clear access boundary between child-facing execution and parent/admin controls so the child-facing flow cannot access household setup, configuration, or approval actions.
@@ -31,3 +35,4 @@ The system SHALL keep the access model organized so a future change can introduc
 #### Scenario: Future helper mode is considered
 - **WHEN** a future change introduces restricted non-parent adult access
 - **THEN** the existing parent/admin and child-facing boundary provides a clear extension point for that addition
+

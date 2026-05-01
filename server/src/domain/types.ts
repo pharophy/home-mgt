@@ -27,7 +27,9 @@ export interface CreateAppOptions {
   store?: ParticipationStore;
   sqlConnectionString?: string;
   sqlClient?: SqlParticipationClient;
+  clientDistDir?: string;
   completionImageService?: CompletionImageService;
+  instructionalImageService?: InstructionalImageService;
 }
 
 export interface LegacyParticipationState
@@ -61,4 +63,20 @@ export interface CompletionImageService {
   generateCelebrationImage(
     request: CompletionImageRequest
   ): Promise<CompletionImageResult>;
+}
+
+export interface InstructionalImageRequest {
+  activityName: string;
+  stepLabels: string[];
+}
+
+export interface InstructionalImageResult {
+  imageUrl: string;
+  prompt: string;
+}
+
+export interface InstructionalImageService {
+  generateInstructionalImage(
+    request: InstructionalImageRequest
+  ): Promise<InstructionalImageResult>;
 }

@@ -1,36 +1,27 @@
-## ADDED Requirements
+# daily-completion-view Specification
 
-### Requirement: Task completion SHALL have a dedicated workflow separate from task creation
-The system SHALL provide a task-completion workflow that is separate from the activity authoring workflow.
+## Purpose
+Define how task completion is handled from the weekly completion context rather than a separate daily workflow surface.
 
-#### Scenario: Parent/admin user switches from creation to completion
-- **WHEN** a parent/admin user navigates from activity authoring to task completion
-- **THEN** the system opens a dedicated completion surface instead of mixing completion controls into the creation flow
+## Requirements
 
-### Requirement: The completion view SHALL show one day of tasks for one person at a time
-The system SHALL scope the task-completion view to a single selected day and a single selected person at a time, where the selected person MAY be a child or an adult household member.
+### Requirement: Task completion SHALL be handled from a weekly matrix instead of a separate daily workflow
+The system SHALL provide task completion through a weekly matrix surface rather than through a separate completion workflow detached from the weekly schedule context.
 
-#### Scenario: User selects a person and day
-- **WHEN** a user opens the completion workflow and chooses a person and a day
-- **THEN** the system shows only the tasks assigned to that person for that day
+#### Scenario: Parent/admin user performs weekly task tracking
+- **WHEN** a parent/admin user needs to review and mark work for the week
+- **THEN** the system presents task completion controls inside the weekly matrix instead of opening a separate daily completion screen
 
-### Requirement: The completion view SHALL render tasks as actionable rows
-The system SHALL render the daily task list as rows that include an instructional task picture, a completion slot, and a completion action on that slot.
+### Requirement: The completion surface SHALL show week context with activities as rows and weekdays as columns
+The system SHALL scope the completion surface to one visible week at a time, with activities as rows and weekdays as columns, while only the current day remains interactive.
 
-#### Scenario: User views the daily completion list
-- **WHEN** the completion workflow loads tasks for the selected person and day
-- **THEN** each task row shows the task picture and an empty completion slot that functions as the button for marking the task complete
+#### Scenario: User views the weekly completion surface
+- **WHEN** the weekly completion matrix loads
+- **THEN** the system shows the week's scheduled activities in a row-and-column matrix and restricts direct toggling to the current weekday column
 
-### Requirement: Step-based activities SHALL remain grouped in the completion view
-The system SHALL present a step-based activity as one activity row in the daily completion view, with subtask progress handled inside that activity context rather than flattening all subtasks into peer rows by default.
+### Requirement: Completion actions SHALL be triggered from matrix cells
+The system SHALL allow the user to mark or unmark a task by activating the corresponding current-day matrix cell.
 
-#### Scenario: User views a step-based activity in the daily list
-- **WHEN** the selected person and day include an activity with subtasks
-- **THEN** the system shows one row for the activity and exposes subtask progress or completion within that activity row context
-
-### Requirement: Completion actions SHALL mark the task complete from the row control
-The system SHALL allow the user to mark a task complete by activating the completion slot button in the task row.
-
-#### Scenario: User completes a task from the row
-- **WHEN** the user activates the empty completion slot for a task row
-- **THEN** the system records that task as completed for the selected person and day
+#### Scenario: User interacts with today's cell
+- **WHEN** the user activates the current-day cell for a scheduled activity
+- **THEN** the system toggles that task's completion state for today from the cell itself

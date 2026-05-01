@@ -6,7 +6,6 @@ import type {
   Completion as SharedCompletion,
   HouseholdSettings,
   RewardType,
-  RewardDefinition,
   RewardLedgerEntry,
   Routine as SharedRoutine,
   RoutineStep as SharedRoutineStep,
@@ -15,7 +14,7 @@ import type {
 
 export type { CelebrationMode, Weekday } from "@shared/preschool";
 
-export type AppRoute = "children" | "activities" | "matrix" | "history" | "tablet";
+export type AppRoute = "setup" | "matrix" | "history";
 
 export type ChildProfile = Pick<
   SharedChildProfile,
@@ -61,8 +60,6 @@ export type Reward = Pick<
   "id" | "amount" | "rewardType" | "childProfileId" | "sourceId" | "completionId"
 >;
 
-export type RewardFormValue = "" | RewardDefinition["type"];
-
 export type AppState = {
   schemaVersion: number;
   householdSettings?: HouseholdSettings;
@@ -94,28 +91,18 @@ export type ActivityDraft = {
   editingActivityType: "routine" | "chore" | null;
   name: string;
   imageUrl: string;
+  requiresApproval: boolean;
+  rewardAmount: string;
+  rewardType: RewardType | "";
   steps: Array<{
     label: string;
     icon: string;
     imageUrl: string;
   }>;
   selectedDays: Weekday[];
-  requiresApproval: boolean;
-  rewardType: RewardFormValue;
-  rewardAmount: string;
 };
 
-export type TabletTask =
-  | {
-      kind: "routineStep";
-      routine: Routine;
-      step: RoutineStep;
-      stepIndex: number;
-    }
-  | {
-      kind: "chore";
-      chore: Chore;
-    };
+export type SetupSection = "children" | "activities";
 
 export type WeekDayOption = {
   value: Weekday;
@@ -132,6 +119,20 @@ export type WeeklyMatrixCell = {
   completionId?: string;
 };
 
+export type TabletRoutineTask = {
+  kind: "routineStep";
+  routine: Routine;
+  step: RoutineStep;
+  stepIndex: number;
+};
+
+export type TabletChoreTask = {
+  kind: "chore";
+  chore: Chore;
+};
+
+export type TabletTask = TabletRoutineTask | TabletChoreTask;
+
 export type WeeklyMatrixRow = {
   id: string;
   name: string;
@@ -139,5 +140,11 @@ export type WeeklyMatrixRow = {
   itemId: string;
   childProfileId: string;
   rewardType: RewardType | null;
+  imageUrl: string | null;
+  steps: Array<{
+    id: string;
+    label: string;
+    imageUrl: string | null;
+  }>;
   cells: WeeklyMatrixCell[];
 };

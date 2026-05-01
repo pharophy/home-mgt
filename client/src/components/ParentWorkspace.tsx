@@ -15,7 +15,7 @@ type ParentWorkspaceProps = {
   chores: Chore[];
   onActivityDraftChange: Dispatch<SetStateAction<ActivityDraft>>;
   onCreateActivity: (event: FormEvent<HTMLFormElement>) => void;
-  onGenerateInstructionalImage: () => void;
+  onActivityNameBlur: () => void;
   onEditRoutine: (routine: Routine) => void;
   onEditChore: (chore: Chore) => void;
   onDeleteActivity: (activity: { id: string; name: string; type: "routine" | "chore" }) => void;
@@ -35,7 +35,7 @@ export function ParentWorkspace({
   chores,
   onActivityDraftChange,
   onCreateActivity,
-  onGenerateInstructionalImage,
+  onActivityNameBlur,
   onEditRoutine,
   onEditChore,
   onDeleteActivity,
@@ -85,27 +85,10 @@ export function ParentWorkspace({
                 name: event.target.value
               }))
             }
+            onBlur={onActivityNameBlur}
             disabled={!selectedChildId}
           />
         </label>
-
-        <label>
-          Instructional image URL
-          <input
-            value={activityDraft.imageUrl}
-            onChange={(event) =>
-              onActivityDraftChange((current) => ({
-                ...current,
-                imageUrl: event.target.value
-              }))
-            }
-            disabled={!selectedChildId}
-          />
-        </label>
-
-        <button type="button" onClick={onGenerateInstructionalImage} disabled={!selectedChildId}>
-          Generate instructional image
-        </button>
 
         {activityDraft.imageUrl ? (
           <div className="completion-art">

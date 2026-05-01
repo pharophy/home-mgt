@@ -1,12 +1,21 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   buildCompletionImagePrompt,
   buildInstructionalImagePrompt,
+  generateInstructionalImage,
   selectCompletionTheme
 } from "./completion-imagery";
 
+const fetchMock = vi.fn<typeof fetch>();
+
+vi.stubGlobal("fetch", fetchMock);
+
 describe("completion imagery helpers", () => {
+  beforeEach(() => {
+    fetchMock.mockReset();
+  });
+
   it("builds prompt-safe original inspired-by imagery requests", () => {
     const prompt = buildCompletionImagePrompt({
       childName: "Milo",
@@ -43,5 +52,33 @@ describe("completion imagery helpers", () => {
     expect(prompt).toContain("instructional image");
     expect(prompt).not.toContain("race cars");
     expect(prompt).not.toContain("cartoon dogs");
+  });
+
+  it("requests instructional images from the backend with parent auth headers", async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          imageUrl: "data:image/png;base64,instructional",
+          prompt: "instructional prompt"
+        }),
+        { status: 200 }
+      )
+    );
+
+    await generateInstructionalImage({
+      activityName: "Morning helper",
+      stepLabels: ["Get dressed"]
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/instructional-images",
+      expect.objectContaining({
+        method: "POST",
+        headers: expect.objectContaining({
+          "x-actor-role": "parentAdmin",
+          "x-actor-id": "parent-1"
+        })
+      })
+    );
   });
 });

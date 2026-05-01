@@ -10,13 +10,13 @@ export const actorHeaders = {
 };
 
 export const weekDays: WeekDayOption[] = [
+  { value: "sunday", label: "Sunday" },
   { value: "monday", label: "Monday" },
   { value: "tuesday", label: "Tuesday" },
   { value: "wednesday", label: "Wednesday" },
   { value: "thursday", label: "Thursday" },
   { value: "friday", label: "Friday" },
-  { value: "saturday", label: "Saturday" },
-  { value: "sunday", label: "Sunday" }
+  { value: "saturday", label: "Saturday" }
 ];
 
 export const initialState: AppState = {
@@ -33,7 +33,7 @@ export const initialState: AppState = {
 };
 
 export const initialTodayPlan: TodayPlan = {
-  day: "monday",
+  day: "sunday",
   routines: [],
   chores: [],
   pendingApprovals: []

@@ -10,6 +10,12 @@
     "dev": "concurrently \"npm run dev --workspace client\" \"npm run dev --workspace server\"",
     "build": "npm run build --workspace client && npm run build --workspace server",
     "start": "npm run start --workspace server",
+    "start:prod": "node scripts/prod.mjs",
+    "prod": "node scripts/prod.mjs",
+    "prod:startup:install": "node scripts/windows-prod-startup.mjs install",
+    "prod:startup:uninstall": "node scripts/windows-prod-startup.mjs uninstall",
+    "test:prod": "node scripts/prod-launcher.test.mjs",
+    "test:startup": "node scripts/windows-prod-startup.test.mjs",
     "test": "npm run test --workspace server",
     "pretest:e2e": "npm run build",
     "test:e2e": "playwright test"

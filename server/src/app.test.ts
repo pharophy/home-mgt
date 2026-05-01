@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, test } from "node:test";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import type { AddressInfo } from "node:net";
@@ -151,6 +151,116 @@ test("parent can create child profiles, routines, and chores", async () => {
   assert.equal(state.childProfiles.length, 1);
   assert.equal(state.routines[0]?.name, "Morning helper");
   assert.equal(state.chores[0]?.name, "Carry napkins to table");
+});
+
+test("production app serves the built client shell and static assets", async () => {
+  const clientDistDir = await mkdtemp(path.join(os.tmpdir(), "home-mgt-client-"));
+  await mkdir(path.join(clientDistDir, "assets"), { recursive: true });
+  await writeFile(
+    path.join(clientDistDir, "index.html"),
+    "<!doctype html><html><body><script src=\"/assets/app.js\"></script></body></html>",
+    "utf8"
+  );
+  await writeFile(path.join(clientDistDir, "assets", "app.js"), "console.log('prod');", "utf8");
+
+  appOptions = {
+    clientDistDir
+  };
+
+  if (closeServer) {
+    await closeServer();
+  }
+  await startServer();
+
+  const shellResponse = await fetch(`${baseUrl}/setup`);
+  assert.equal(shellResponse.status, 200);
+  assert.match(await shellResponse.text(), /<script src="\/assets\/app\.js"><\/script>/);
+
+  const assetResponse = await fetch(`${baseUrl}/assets/app.js`);
+  assert.equal(assetResponse.status, 200);
+  assert.equal(await assetResponse.text(), "console.log('prod');");
+});
+
+test("parent can save a routine with a large instructional image payload", async () => {
+  const childProfileResponse = await requestJson("/api/child-profiles", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-actor-role": "parentAdmin",
+      "x-actor-id": "parent-1"
+    },
+    body: JSON.stringify({
+      name: "Milo",
+      color: "#F59E0B"
+    })
+  });
+
+  const childProfile = childProfileResponse.json as { id: string };
+  const largeImageUrl = `data:image/png;base64,${"a".repeat(200_000)}`;
+
+  const routineResponse = await requestJson("/api/routines", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-actor-role": "parentAdmin",
+      "x-actor-id": "parent-1"
+    },
+    body: JSON.stringify({
+      childProfileId: childProfile.id,
+      name: "Morning helper",
+      imageUrl: largeImageUrl,
+      schedule: {
+        days: ["monday"]
+      },
+      steps: [
+        {
+          label: "Get dressed",
+          icon: "shirt",
+          imageUrl: largeImageUrl
+        }
+      ]
+    })
+  });
+
+  assert.equal(routineResponse.status, 201);
+  const routine = routineResponse.json as { imageUrl: string; steps: Array<{ imageUrl?: string }> };
+  assert.equal(routine.imageUrl, largeImageUrl);
+  assert.equal(routine.steps[0]?.imageUrl, largeImageUrl);
+});
+
+test("parent can request an instructional image for an activity", async () => {
+  appOptions = {
+    instructionalImageService: {
+      generateInstructionalImage: async () => ({
+        imageUrl: "data:image/png;base64,instructional",
+        prompt: "instructional prompt"
+      })
+    }
+  };
+
+  if (closeServer) {
+    await closeServer();
+  }
+  await startServer();
+
+  const response = await requestJson("/api/instructional-images", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-actor-role": "parentAdmin",
+      "x-actor-id": "parent-1"
+    },
+    body: JSON.stringify({
+      activityName: "Morning helper",
+      stepLabels: ["Get dressed", "Brush teeth"]
+    })
+  });
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(response.json, {
+    imageUrl: "data:image/png;base64,instructional",
+    prompt: "instructional prompt"
+  });
 });
 
 test("child display can record progress but cannot access parent admin state", async () => {

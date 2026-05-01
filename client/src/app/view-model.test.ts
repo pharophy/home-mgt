@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { Routine, TabletTask, Weekday } from "./types";
 import {
+  buildWeeklyMatrixRows,
   currentWeekday,
   getActiveChoreTask,
   getActiveRoutineTask,
@@ -80,5 +81,57 @@ describe("app view model helpers", () => {
     } satisfies TabletTask);
 
     expect(getActiveTabletTask(routineTask, choreTask)).toEqual(routineTask);
+  });
+
+  it("builds weekly matrix rows with generated pictures for routines and subtasks", () => {
+    const rows = buildWeeklyMatrixRows({
+      childProfileId: "child-1",
+      routines: [
+        {
+          id: "routine-1",
+          name: "Morning helper",
+          childProfileId: "child-1",
+          imageUrl: "",
+          schedule: { days: ["monday"] },
+          steps: [
+            { id: "step-1", label: "Get dressed", icon: "", imageUrl: "", order: 0 },
+            { id: "step-2", label: "Brush teeth", icon: "", imageUrl: "", order: 1 }
+          ]
+        }
+      ],
+      chores: [
+        {
+          id: "chore-1",
+          name: "Carry napkins",
+          childProfileId: "child-1",
+          imageUrl: "",
+          recurrence: { days: ["monday"] },
+          requiresApproval: false
+        }
+      ],
+      completions: [],
+      currentDay: "monday"
+    });
+
+    expect(rows[0]).toMatchObject({
+      id: "routine-1",
+      imageUrl: null,
+      steps: [
+        {
+          id: "step-1",
+          label: "Get dressed",
+          imageUrl: null
+        },
+        {
+          id: "step-2",
+          label: "Brush teeth",
+          imageUrl: null
+        }
+      ]
+    });
+    expect(rows[1]).toMatchObject({
+      id: "chore-1",
+      imageUrl: null
+    });
   });
 });

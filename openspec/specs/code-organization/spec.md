@@ -1,4 +1,9 @@
-## ADDED Requirements
+# code-organization Specification
+
+## Purpose
+Define repository-level modular organization rules that separate domain, infrastructure, routing, helpers, and UI responsibilities into cohesive files.
+
+## Requirements
 
 ### Requirement: Mixed-responsibility application files MUST be split into cohesive modules
 

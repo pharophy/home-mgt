@@ -1,4 +1,6 @@
 import type { CelebrationMode } from "./types";
+import { actorHeaders } from "./constants";
+import { fetchJson } from "./api";
 
 export type CompletionImageRequest = {
   childName: string;
@@ -108,21 +110,18 @@ export function buildInstructionalImagePrompt({
 }
 
 function svgDataUrl(label: string, theme: string, celebrationMode: CelebrationMode): string {
-  const background =
-    celebrationMode === "gentle"
-      ? "#e8f6ef"
-      : "#fff0c7";
-  const accent = celebrationMode === "gentle" ? "#58a27c" : "#f08a24";
+  const safeLabel = label.replace(/[<>&"]/g, "");
+  const safeTheme = theme.replace(/[<>&"]/g, "");
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="320" height="200" viewBox="0 0 320 200">
-      <rect width="320" height="200" rx="24" fill="${background}" />
-      <circle cx="56" cy="46" r="18" fill="${accent}" opacity="0.35" />
-      <circle cx="270" cy="54" r="14" fill="${accent}" opacity="0.22" />
-      <text x="24" y="88" font-size="18" font-family="Arial, sans-serif" fill="#243042">${label}</text>
-      <text x="24" y="122" font-size="14" font-family="Arial, sans-serif" fill="#526173">Inspired by ${theme}</text>
-      <text x="24" y="156" font-size="12" font-family="Arial, sans-serif" fill="#7a8794">Original celebration art</text>
+      <rect width="320" height="200" rx="24" fill="#e8f6ef" />
+      <circle cx="56" cy="46" r="18" fill="#58a27c" opacity="0.35" />
+      <circle cx="270" cy="54" r="14" fill="#58a27c" opacity="0.22" />
+      <text x="24" y="88" font-size="18" font-family="Arial, sans-serif" fill="#243042">${safeLabel}</text>
+      <text x="24" y="122" font-size="14" font-family="Arial, sans-serif" fill="#526173">Inspired by ${safeTheme}</text>
+      <text x="24" y="156" font-size="12" font-family="Arial, sans-serif" fill="#7a8794">${celebrationMode} celebration mode</text>
     </svg>
-  `.trim();
+  `;
 
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
@@ -155,20 +154,14 @@ async function defaultGenerator(
 async function defaultInstructionalGenerator(
   request: InstructionalImageRequest
 ): Promise<InstructionalImageResult> {
-  const prompt = buildInstructionalImagePrompt(request);
-
-  await new Promise<void>((resolve) => {
-    setTimeout(resolve, 10);
+  return fetchJson<InstructionalImageResult>("/api/instructional-images", {
+    method: "POST",
+    headers: {
+      ...actorHeaders,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(request)
   });
-
-  return {
-    imageUrl: svgDataUrl(
-      request.activityName,
-      request.stepLabels[0] ?? "preschool task",
-      "gentle"
-    ),
-    prompt
-  };
 }
 
 export async function generateCompletionImage(

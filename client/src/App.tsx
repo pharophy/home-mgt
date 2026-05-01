@@ -1,5 +1,5 @@
 import type { FormEvent } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { fetchJson } from "./app/api";
 import { generateInstructionalImage } from "./app/completion-imagery";
@@ -13,26 +13,18 @@ import type {
   ChildProfileDraft,
   Chore,
   Completion,
-  RewardFormValue,
   Routine,
-  TabletTask,
-  TodayPlan
+  SetupSection,
+  TodayPlan,
+  Weekday
 } from "./app/types";
 import {
   buildWeeklyMatrixRows,
-  currentDayNumber,
   currentWeekday,
-  getActiveChoreTask,
-  getActiveRoutineTask,
-  getActiveTabletTask,
   toggleDay
 } from "./app/view-model";
-import { ChildProfilesPage } from "./components/ChildProfilesPage";
-import { ChildSelectorPanel } from "./components/ChildSelectorPanel";
-import { DashboardPanel } from "./components/DashboardPanel";
 import { HistoryPage } from "./components/HistoryPage";
-import { ParentWorkspace } from "./components/ParentWorkspace";
-import { TabletStage } from "./components/TabletStage";
+import { SetupWorkspace } from "./components/SetupWorkspace";
 import { WeeklyMatrix } from "./components/WeeklyMatrix";
 
 type CompletionImageResult = {
@@ -72,36 +64,53 @@ function emptyActivityDraft(): ActivityDraft {
     editingActivityType: null,
     name: "",
     imageUrl: "",
-    steps: [
-      {
-        label: "",
-        icon: "",
-        imageUrl: ""
-      }
-    ],
-    selectedDays: [],
     requiresApproval: false,
+    rewardAmount: "",
     rewardType: "",
-    rewardAmount: ""
+    steps: [],
+    selectedDays: []
   };
+}
+
+function readSetupSectionFromHash(): SetupSection {
+  const hash = window.location.hash.replace(/^#/, "");
+  return hash === "activities" ? "activities" : "children";
 }
 
 function completionArtworkKey(childProfileId: string, day: string | undefined, itemId: string): string {
   return `${childProfileId}:${day ?? currentWeekday()}:${itemId}`;
 }
 
+function hasGeneratedInstructionalImage(imageUrl: string | null | undefined): boolean {
+  return typeof imageUrl === "string" && imageUrl.startsWith("data:image/png;base64,");
+}
+
 function readRouteFromHash(): AppRoute {
   const hash = window.location.hash.replace(/^#/, "");
-  if (
-    hash === "children" ||
-    hash === "activities" ||
-    hash === "history" ||
-    hash === "tablet"
-  ) {
+  if (hash === "history") {
     return hash;
   }
 
+  if (hash === "setup" || hash === "children" || hash === "activities") {
+    return "setup";
+  }
+
   return "matrix";
+}
+
+function buildWeekDayNumbers(now = new Date()): Record<Weekday, number> {
+  const sundayStart = new Date(now);
+  sundayStart.setDate(sundayStart.getDate() - sundayStart.getDay());
+
+  return {
+    sunday: sundayStart.getDate(),
+    monday: new Date(sundayStart.getFullYear(), sundayStart.getMonth(), sundayStart.getDate() + 1).getDate(),
+    tuesday: new Date(sundayStart.getFullYear(), sundayStart.getMonth(), sundayStart.getDate() + 2).getDate(),
+    wednesday: new Date(sundayStart.getFullYear(), sundayStart.getMonth(), sundayStart.getDate() + 3).getDate(),
+    thursday: new Date(sundayStart.getFullYear(), sundayStart.getMonth(), sundayStart.getDate() + 4).getDate(),
+    friday: new Date(sundayStart.getFullYear(), sundayStart.getMonth(), sundayStart.getDate() + 5).getDate(),
+    saturday: new Date(sundayStart.getFullYear(), sundayStart.getMonth(), sundayStart.getDate() + 6).getDate()
+  };
 }
 
 function removeRelatedCompletions(
@@ -122,23 +131,27 @@ function removeRelatedCompletions(
 
 export default function App() {
   const [state, setState] = useState<AppState>(initialState);
-  const [todayPlan, setTodayPlan] = useState<TodayPlan>(initialTodayPlan);
+  const [, setTodayPlan] = useState<TodayPlan>(initialTodayPlan);
   const [activeRoute, setActiveRoute] = useState<AppRoute>(readRouteFromHash);
+  const [setupSection, setSetupSection] = useState<SetupSection>(readSetupSectionFromHash);
   const [selectedChildId, setSelectedChildId] = useState("");
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [savingMessage, setSavingMessage] = useState<string | null>(null);
-  const [celebrationMode, setCelebrationMode] = useState<CelebrationMode>("full");
-  const [routineProgress, setRoutineProgress] = useState<Record<string, number>>({});
-  const [completedChoreIds, setCompletedChoreIds] = useState<string[]>([]);
-  const [tabletMessage, setTabletMessage] = useState<string | null>(null);
+  const [celebrationMode] = useState<CelebrationMode>("full");
   const [childDraft, setChildDraft] = useState<ChildProfileDraft>(emptyChildDraft());
   const [activityDraft, setActivityDraft] = useState<ActivityDraft>(emptyActivityDraft());
+  const [lastInstructionalPreviewName, setLastInstructionalPreviewName] = useState("");
+  const [childEditorOpen, setChildEditorOpen] = useState(false);
+  const [activityEditorOpen, setActivityEditorOpen] = useState(false);
   const [completionArtwork, setCompletionArtwork] = useState<
     Record<string, { status: CompletionArtworkState; imageUrl?: string }>
   >({});
   const [celebrationOverlay, setCelebrationOverlay] =
     useState<CelebrationOverlayState | null>(null);
+  const pendingInstructionalBackfillKeys = useRef(new Set<string>());
+  const shouldBackfillInstructionalImages =
+    import.meta.env.MODE !== "test" ||
+    Boolean((window as Window & { __enableInstructionalBackfill__?: boolean }).__enableInstructionalBackfill__);
 
   async function loadTodayPlan(childId: string): Promise<void> {
     const plan = await fetchJson<TodayPlan>(
@@ -173,8 +186,6 @@ export default function App() {
         await loadState();
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
-      } finally {
-        setLoading(false);
       }
     }
 
@@ -184,6 +195,7 @@ export default function App() {
   useEffect(() => {
     function handleHashChange() {
       setActiveRoute(readRouteFromHash());
+      setSetupSection(readSetupSectionFromHash());
     }
 
     window.addEventListener("hashchange", handleHashChange);
@@ -205,27 +217,20 @@ export default function App() {
   }, [celebrationOverlay]);
 
   function navigateTo(route: AppRoute): void {
+    if (route === "setup") {
+      window.location.hash = setupSection;
+      setActiveRoute("setup");
+      return;
+    }
+
     window.location.hash = route === "matrix" ? "" : route;
     setActiveRoute(route);
   }
 
-  function toRewardDefinition(
-    rewardType: RewardFormValue,
-    rewardAmount: string
-  ): { type: "stars" | "stickers"; amount: number } | undefined {
-    const parsedAmount = Number(rewardAmount);
-    if (
-      (rewardType === "stars" || rewardType === "stickers") &&
-      Number.isFinite(parsedAmount) &&
-      parsedAmount > 0
-    ) {
-      return {
-        type: rewardType,
-        amount: parsedAmount
-      };
-    }
-
-    return undefined;
+  function openSetupSection(section: SetupSection): void {
+    setSetupSection(section);
+    window.location.hash = section;
+    setActiveRoute("setup");
   }
 
   async function handleSubmitChildProfile(event: FormEvent<HTMLFormElement>) {
@@ -261,6 +266,7 @@ export default function App() {
       }));
       setSelectedChildId(childProfile.id);
       setChildDraft(emptyChildDraft(childDraft.color));
+      setChildEditorOpen(false);
 
       if (!childDraft.editingChildId) {
         setTodayPlan(initialTodayPlan);
@@ -280,6 +286,19 @@ export default function App() {
       color: child.color,
       motivatorsText: child.motivators.join(", ")
     });
+    setChildEditorOpen(true);
+    openSetupSection("children");
+  }
+
+  function startCreateChild(): void {
+    setChildDraft((current) => emptyChildDraft(current.color));
+    setChildEditorOpen(true);
+    openSetupSection("children");
+  }
+
+  function cancelChildEditor(): void {
+    setChildDraft((current) => emptyChildDraft(current.color));
+    setChildEditorOpen(false);
   }
 
   async function handleDeleteChildProfile(child: ChildProfile): Promise<void> {
@@ -310,6 +329,9 @@ export default function App() {
       setChildDraft((current) =>
         current.editingChildId === child.id ? emptyChildDraft(current.color) : current
       );
+      if (childDraft.editingChildId === child.id) {
+        setChildEditorOpen(false);
+      }
 
       if (nextSelectedChildId) {
         await loadTodayPlan(nextSelectedChildId);
@@ -343,14 +365,66 @@ export default function App() {
     }
 
     try {
-      const reward = toRewardDefinition(activityDraft.rewardType, activityDraft.rewardAmount);
+      const resolvedActivityImageUrl =
+        activityDraft.imageUrl.trim().length > 0 &&
+        hasGeneratedInstructionalImage(activityDraft.imageUrl)
+          ? activityDraft.imageUrl.trim()
+        : (
+            await generateInstructionalImage({
+              activityName: trimmedName,
+              stepLabels: activityDraft.steps.map((step) => step.label.trim()).filter(Boolean)
+            })
+          ).imageUrl;
+      const resolvedSteps = await Promise.all(
+        activityDraft.steps.map(async (step) => {
+          const label = step.label.trim();
+          if (!label) {
+            return null;
+          }
+
+          const imageUrl =
+            step.imageUrl.trim().length > 0 && hasGeneratedInstructionalImage(step.imageUrl)
+              ? step.imageUrl.trim()
+            : (
+                await generateInstructionalImage({
+                  activityName: label,
+                  stepLabels: [trimmedName]
+                })
+              ).imageUrl;
+
+          return {
+            label,
+            icon: step.icon.trim(),
+            imageUrl
+          };
+        })
+      );
+      const resolvedActivitySteps = resolvedSteps.filter(
+        (step): step is { label: string; icon: string; imageUrl: string } => step !== null
+      );
+      const existingReward =
+        activityDraft.editingActivityType === "routine"
+          ? state.routines.find((entry) => entry.id === activityDraft.editingActivityId)?.reward
+          : activityDraft.editingActivityType === "chore"
+            ? state.chores.find((entry) => entry.id === activityDraft.editingActivityId)?.reward
+            : undefined;
+      const reward = activityDraft.editingActivityId ? existingReward : undefined;
+      const existingRequiresApproval =
+        activityDraft.editingActivityType === "chore"
+          ? state.chores.find((entry) => entry.id === activityDraft.editingActivityId)
+              ?.requiresApproval
+          : undefined;
+      const requiresApproval =
+        activityDraft.editingActivityType === "chore"
+          ? existingRequiresApproval ?? false
+          : false;
       const steps = activityDraft.steps
         .map((step) => ({
           label: step.label.trim(),
-          icon: step.icon.trim(),
-          imageUrl: step.imageUrl.trim()
+          icon: "",
+          imageUrl: step.imageUrl.trim().length > 0 ? step.imageUrl.trim() : undefined
         }))
-        .filter((step) => step.label || step.icon || step.imageUrl);
+        .filter((step) => step.label);
       const isStepBased = steps.length > 0;
       const shouldSaveRoutine =
         activityDraft.editingActivityType === "routine" ||
@@ -375,12 +449,12 @@ export default function App() {
                 ? {}
                 : { childProfileId: selectedChildId }),
               name: trimmedName,
-              imageUrl: activityDraft.imageUrl || undefined,
+              imageUrl: resolvedActivityImageUrl,
               schedule: {
                 days: activityDraft.selectedDays
               },
-              steps,
-              reward
+              steps: resolvedActivitySteps,
+              ...(reward ? { reward } : {})
             })
           }
         );
@@ -419,12 +493,12 @@ export default function App() {
                 ? {}
                 : { childProfileId: selectedChildId }),
               name: trimmedName,
-              imageUrl: activityDraft.imageUrl || undefined,
+              imageUrl: resolvedActivityImageUrl,
               recurrence: {
                 days: activityDraft.selectedDays
               },
-              requiresApproval: activityDraft.requiresApproval,
-              reward
+              requiresApproval,
+              ...(reward ? { reward } : {})
             })
           }
         );
@@ -447,6 +521,8 @@ export default function App() {
       }
 
       setActivityDraft(emptyActivityDraft());
+      setLastInstructionalPreviewName("");
+      setActivityEditorOpen(false);
       setSavingMessage(activityDraft.editingActivityId ? "Activity updated" : "Activity saved");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to save activity");
@@ -455,9 +531,6 @@ export default function App() {
 
   async function handleSelectChild(childId: string): Promise<void> {
     setSelectedChildId(childId);
-    setRoutineProgress({});
-    setCompletedChoreIds([]);
-    setTabletMessage(null);
 
     try {
       await loadTodayPlan(childId);
@@ -472,17 +545,19 @@ export default function App() {
       editingActivityType: "routine",
       name: routine.name,
       imageUrl: routine.imageUrl ?? "",
+      requiresApproval: false,
+      rewardAmount: routine.reward ? String(routine.reward.amount) : "",
+      rewardType: routine.reward?.type ?? "",
       steps: routine.steps.map((step) => ({
         label: step.label,
-        icon: step.icon ?? "",
+        icon: "",
         imageUrl: step.imageUrl ?? ""
       })),
-      selectedDays: routine.schedule.days,
-      requiresApproval: false,
-      rewardType: routine.reward?.type ?? "",
-      rewardAmount: routine.reward ? String(routine.reward.amount) : ""
+      selectedDays: routine.schedule.days
     });
-    navigateTo("activities");
+    setActivityEditorOpen(true);
+    setLastInstructionalPreviewName("");
+    openSetupSection("activities");
   }
 
   function handleEditChore(chore: Chore): void {
@@ -491,18 +566,28 @@ export default function App() {
       editingActivityType: "chore",
       name: chore.name,
       imageUrl: chore.imageUrl ?? "",
-      steps: [
-        {
-          label: "",
-          icon: "",
-          imageUrl: ""
-        }
-      ],
-      selectedDays: chore.recurrence.days,
       requiresApproval: chore.requiresApproval,
+      rewardAmount: chore.reward ? String(chore.reward.amount) : "",
       rewardType: chore.reward?.type ?? "",
-      rewardAmount: chore.reward ? String(chore.reward.amount) : ""
+      steps: [],
+      selectedDays: chore.recurrence.days
     });
+    setActivityEditorOpen(true);
+    setLastInstructionalPreviewName("");
+    openSetupSection("activities");
+  }
+
+  function startCreateActivity(): void {
+    setActivityDraft(emptyActivityDraft());
+    setLastInstructionalPreviewName("");
+    setActivityEditorOpen(true);
+    openSetupSection("activities");
+  }
+
+  function cancelActivityEditor(): void {
+    setActivityDraft(emptyActivityDraft());
+    setLastInstructionalPreviewName("");
+    setActivityEditorOpen(false);
   }
 
   async function handleDeleteActivity(activity: {
@@ -561,16 +646,31 @@ export default function App() {
       setActivityDraft((current) =>
         current.editingActivityId === activity.id ? emptyActivityDraft() : current
       );
+      setActivityEditorOpen((current) =>
+        activityDraft.editingActivityId === activity.id ? false : current
+      );
       setSavingMessage("Activity deleted");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to delete activity");
     }
   }
 
-  async function handleGenerateInstructionalImage(): Promise<void> {
+  async function handleGenerateInstructionalImage(activityName: string): Promise<void> {
+    const trimmedName = activityName.trim();
+    if (
+      !selectedChildId ||
+      !trimmedName ||
+      (hasGeneratedInstructionalImage(activityDraft.imageUrl) && Boolean(activityDraft.imageUrl)) ||
+      trimmedName === lastInstructionalPreviewName
+    ) {
+      return;
+    }
+
     try {
+      setError(null);
+      setLastInstructionalPreviewName(trimmedName);
       const result = await generateInstructionalImage({
-        activityName: activityDraft.name,
+        activityName: trimmedName,
         stepLabels: activityDraft.steps.map((step) => step.label)
       });
 
@@ -583,64 +683,37 @@ export default function App() {
     }
   }
 
-  const selectedChild =
-    state.childProfiles.find((child) => child.id === selectedChildId) ?? null;
+  function handleAddActivityStep(): void {
+    setActivityDraft((current) => ({
+      ...current,
+      steps: [
+        ...current.steps,
+        {
+          label: "",
+          icon: "",
+          imageUrl: ""
+        }
+      ]
+    }));
 
-  const todayRoutines = Array.isArray(todayPlan.routines) ? todayPlan.routines : [];
-  const todayChores = Array.isArray(todayPlan.chores) ? todayPlan.chores : [];
-  const todayPendingApprovals = Array.isArray(todayPlan.pendingApprovals)
-    ? todayPlan.pendingApprovals
-    : [];
+  }
 
-  const routineCompletionIds = new Set(
-    state.completions
-      .filter(
-        (completion) =>
-          completion.childProfileId === selectedChildId &&
-          (!completion.scheduledDay || completion.scheduledDay === todayPlan.day) &&
-          (completion.status === "completed" || completion.status === "approved")
-      )
-      .map((completion) => completion.itemId)
-  );
+  function handleActivityDraftChange(
+    updater: (current: ActivityDraft) => ActivityDraft
+  ): void {
+    setActivityDraft((current) => {
+      const next = updater(current);
+      if (next.name === current.name) {
+        return next;
+      }
 
-  const completedRoutineNames = todayRoutines
-    .filter(
-      (routine) =>
-        routineCompletionIds.has(routine.id) ||
-        (Array.isArray(routine.steps) &&
-          routine.steps.length > 0 &&
-          routine.steps.every((step) => routineCompletionIds.has(step.id)))
-    )
-    .map((routine) => routine.name);
-
-  const reviewItemNames = todayPendingApprovals
-    .map((completion) => {
-      const pendingChore = todayChores.find((chore) => chore.id === completion.itemId);
-      return pendingChore?.name;
-    })
-    .filter((value): value is string => typeof value === "string");
-
-  const completedChoreNames = todayChores
-    .filter(
-      (chore) =>
-        routineCompletionIds.has(chore.id) &&
-        !todayPendingApprovals.some((completion) => completion.itemId === chore.id)
-    )
-    .map((chore) => chore.name);
-
-  const completedItems = [...completedRoutineNames, ...completedChoreNames];
-  const incompleteItems = [
-    ...todayRoutines
-      .filter((routine) => !completedRoutineNames.includes(routine.name))
-      .map((routine) => routine.name),
-    ...todayChores
-      .filter((chore) => !completedChoreNames.includes(chore.name))
-      .map((chore) => chore.name)
-  ];
-
-  const activeRoutineTask = getActiveRoutineTask(todayRoutines, routineProgress);
-  const activeChoreTask = getActiveChoreTask(todayChores, completedChoreIds);
-  const activeTabletTask: TabletTask | null = getActiveTabletTask(activeRoutineTask, activeChoreTask);
+      return {
+        ...next,
+        imageUrl: ""
+      };
+    });
+    setLastInstructionalPreviewName("");
+  }
 
   const weeklyMatrixRows = selectedChildId
     ? buildWeeklyMatrixRows({
@@ -651,6 +724,216 @@ export default function App() {
         currentDay: currentWeekday()
       })
     : [];
+  const weekDayNumbers = buildWeekDayNumbers();
+
+  useEffect(() => {
+    if (!shouldBackfillInstructionalImages) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function backfillMissingInstructionalImages(): Promise<void> {
+      try {
+      const routinesNeedingImages = state.routines.filter(
+        (routine) =>
+          !hasGeneratedInstructionalImage(routine.imageUrl) ||
+          routine.steps.some((step) => !hasGeneratedInstructionalImage(step.imageUrl))
+      );
+      const choresNeedingImages = state.chores.filter(
+        (chore) => !hasGeneratedInstructionalImage(chore.imageUrl)
+      );
+
+        if (routinesNeedingImages.length === 0 && choresNeedingImages.length === 0) {
+          return;
+        }
+
+        const routineBackfills = await Promise.all(
+          routinesNeedingImages.map(async (routine) => {
+            const key = `routine:${routine.id}:${routine.name}:${routine.steps
+              .map((step) => `${step.id}:${step.label}:${step.imageUrl ?? ""}`)
+              .join("|")}`;
+            if (pendingInstructionalBackfillKeys.current.has(key)) {
+              return null;
+            }
+
+            pendingInstructionalBackfillKeys.current.add(key);
+            try {
+              const routineImageUrl =
+                routine.imageUrl?.trim().length && hasGeneratedInstructionalImage(routine.imageUrl)
+                  ? routine.imageUrl
+                : (
+                    await generateInstructionalImage({
+                      activityName: routine.name,
+                      stepLabels: routine.steps.map((step) => step.label)
+                    })
+                  ).imageUrl;
+
+              const stepImageUrls = await Promise.all(
+                routine.steps.map(async (step) => {
+                  if (hasGeneratedInstructionalImage(step.imageUrl)) {
+                    return step.imageUrl;
+                  }
+
+                  const result = await generateInstructionalImage({
+                    activityName: step.label,
+                    stepLabels: [routine.name]
+                  });
+                  return result.imageUrl;
+                })
+              );
+
+              if (cancelled) {
+                return null;
+              }
+
+              await fetchJson<void>(`/api/routines/${routine.id}`, {
+                method: "PATCH",
+                headers: {
+                  ...actorHeaders,
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                  name: routine.name,
+                  imageUrl: routineImageUrl,
+                  schedule: {
+                    days: routine.schedule.days
+                  },
+                  steps: routine.steps.map((step, index) => ({
+                    label: step.label,
+                    icon: step.icon ?? "",
+                    imageUrl: stepImageUrls[index],
+                    order: index
+                  })),
+                  ...(routine.reward ? { reward: routine.reward } : {})
+                })
+              });
+
+              return {
+                id: routine.id,
+                imageUrl: routineImageUrl,
+                stepImageUrls
+              };
+            } finally {
+              pendingInstructionalBackfillKeys.current.delete(key);
+            }
+          })
+        );
+
+        const choreBackfills = await Promise.all(
+          choresNeedingImages.map(async (chore) => {
+            const key = `chore:${chore.id}:${chore.name}`;
+            if (pendingInstructionalBackfillKeys.current.has(key)) {
+              return null;
+            }
+
+            pendingInstructionalBackfillKeys.current.add(key);
+            try {
+              const imageUrl =
+                chore.imageUrl?.trim().length && hasGeneratedInstructionalImage(chore.imageUrl)
+                  ? chore.imageUrl
+                : (
+                    await generateInstructionalImage({
+                      activityName: chore.name,
+                      stepLabels: []
+                    })
+                  ).imageUrl;
+
+              if (cancelled) {
+                return null;
+              }
+
+              await fetchJson<void>(`/api/chores/${chore.id}`, {
+                method: "PATCH",
+                headers: {
+                  ...actorHeaders,
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                  name: chore.name,
+                  imageUrl,
+                  recurrence: {
+                    days: chore.recurrence.days
+                  },
+                  requiresApproval: chore.requiresApproval,
+                  ...(chore.reward ? { reward: chore.reward } : {})
+                })
+              });
+
+              return {
+                id: chore.id,
+                imageUrl
+              };
+            } finally {
+              pendingInstructionalBackfillKeys.current.delete(key);
+            }
+          })
+        );
+
+        if (cancelled) {
+          return;
+        }
+
+        const routineImageMap = new Map(
+          routineBackfills
+            .filter(
+              (entry): entry is { id: string; imageUrl: string; stepImageUrls: string[] } =>
+                entry !== null
+            )
+            .map((entry) => [entry.id, entry])
+        );
+        const choreImageMap = new Map(
+          choreBackfills
+            .filter((entry): entry is { id: string; imageUrl: string } => entry !== null)
+            .map((entry) => [entry.id, entry])
+        );
+
+        if (routineImageMap.size === 0 && choreImageMap.size === 0) {
+          return;
+        }
+
+        setState((current) => ({
+          ...current,
+          routines: current.routines.map((routine) => {
+            const backfill = routineImageMap.get(routine.id);
+            if (!backfill) {
+              return routine;
+            }
+
+            return {
+              ...routine,
+              imageUrl: backfill.imageUrl,
+              steps: routine.steps.map((step, index) => ({
+                ...step,
+                imageUrl: backfill.stepImageUrls[index] ?? step.imageUrl
+              }))
+            };
+          }),
+          chores: current.chores.map((chore) => {
+            const backfill = choreImageMap.get(chore.id);
+            if (!backfill) {
+              return chore;
+            }
+
+            return {
+              ...chore,
+              imageUrl: backfill.imageUrl
+            };
+          })
+        }));
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Unable to backfill instructional images");
+        }
+      }
+    }
+
+    void backfillMissingInstructionalImages();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [state.chores, state.routines]);
 
   const persistedCompletionArtwork = Object.fromEntries(
     state.completions
@@ -668,86 +951,6 @@ export default function App() {
     ...persistedCompletionArtwork,
     ...completionArtwork
   };
-
-  async function handleCompleteRoutineStep(task: Extract<TabletTask, { kind: "routineStep" }>) {
-    setError(null);
-
-    try {
-      const completion = await fetchJson<Completion>("/api/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-actor-role": "childDisplay",
-          "x-actor-id": "tablet-1"
-        },
-        body: JSON.stringify({
-          itemType: "routineStep",
-          itemId: task.step.id,
-          childProfileId: selectedChildId,
-          scheduledDay: todayPlan.day,
-          parentEntityType: "routine",
-          parentEntityId: task.routine.id
-        })
-      });
-
-      const nextStepIndex = task.stepIndex + 1;
-      const isFinished = nextStepIndex >= task.routine.steps.length;
-      setState((current) => ({
-        ...current,
-        completions: [...current.completions, completion]
-      }));
-      setRoutineProgress((current) => ({
-        ...current,
-        [task.routine.id]: nextStepIndex
-      }));
-      setTabletMessage(isFinished ? `${task.routine.name} complete` : `${task.step.label} complete`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to record progress");
-    }
-  }
-
-  async function handleCompleteChore(task: Extract<TabletTask, { kind: "chore" }>) {
-    setError(null);
-
-    try {
-      const completion = await fetchJson<Completion>("/api/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-actor-role": "childDisplay",
-          "x-actor-id": "tablet-1"
-        },
-        body: JSON.stringify({
-          itemType: "chore",
-          itemId: task.chore.id,
-          childProfileId: selectedChildId,
-          scheduledDay: todayPlan.day
-        })
-      });
-
-      setCompletedChoreIds((current) => [...current, task.chore.id]);
-      setState((current) => ({
-        ...current,
-        completions: [...current.completions, completion],
-        pendingApprovals:
-          completion.status === "pendingApproval"
-            ? [...current.pendingApprovals, completion]
-            : current.pendingApprovals
-      }));
-      if (completion.status === "pendingApproval") {
-        setTodayPlan((current) => ({
-          ...current,
-          pendingApprovals: [...current.pendingApprovals, completion]
-        }));
-        setTabletMessage("Waiting for parent check");
-        return;
-      }
-
-      setTabletMessage(`${task.chore.name} complete`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to record chore");
-    }
-  }
 
   async function handleToggleMatrixCell(row: (typeof weeklyMatrixRows)[number]): Promise<void> {
     const today = currentWeekday();
@@ -891,150 +1094,90 @@ export default function App() {
     }
   }
 
-  const stickerHistoryCount = state.completions.filter((entry) => Boolean(entry.celebrationImageUrl)).length;
-
   return (
     <main className="app-shell">
-      <section className="hero-panel">
-        <div>
-          <p className="eyebrow">Preschool Participation MVP</p>
-          <h1>Build a calm, visual plan for today.</h1>
-          <p className="lede">
-            Keep profiles, activities, the weekly matrix, and saved sticker history in
-            one clear parent workflow.
-          </p>
-        </div>
-        <div className="hero-summary">
-          <div>
-            <span>Children</span>
-            <strong>{state.childProfiles.length}</strong>
-          </div>
-          <div>
-            <span>Pending approvals</span>
-            <strong>{state.pendingApprovals.length}</strong>
-          </div>
-          <div>
-            <span>Saved stickers</span>
-            <strong>{stickerHistoryCount}</strong>
-          </div>
-        </div>
-      </section>
-
       {error ? <p className="feedback error">{error}</p> : null}
       {savingMessage ? <p className="feedback success">{savingMessage}</p> : null}
 
       <nav className="mode-switch panel" aria-label="Top-level navigation">
-        <button type="button" aria-pressed={activeRoute === "children"} onClick={() => navigateTo("children")}>
-          Children
-        </button>
         <button type="button" aria-pressed={activeRoute === "matrix"} onClick={() => navigateTo("matrix")}>
-          Matrix
+          Sticker Chart
         </button>
-        <button type="button" aria-pressed={activeRoute === "activities"} onClick={() => navigateTo("activities")}>
-          Activities
+        <button type="button" aria-pressed={activeRoute === "setup"} onClick={() => openSetupSection(setupSection)}>
+          Setup
         </button>
         <button type="button" aria-pressed={activeRoute === "history"} onClick={() => navigateTo("history")}>
           History
         </button>
-        <button type="button" aria-pressed={activeRoute === "tablet"} onClick={() => navigateTo("tablet")}>
-          Tablet
-        </button>
       </nav>
 
-      {activeRoute === "children" ? (
-        <ChildProfilesPage
+      {activeRoute === "setup" ? (
+        <SetupWorkspace
+          section={setupSection}
+          childEditorOpen={childEditorOpen}
+          activityEditorOpen={activityEditorOpen}
           childDraft={childDraft}
+          activityDraft={activityDraft}
           childProfiles={state.childProfiles}
           selectedChildId={selectedChildId}
+          routines={state.routines}
+          chores={state.chores}
+          onSelectSection={openSetupSection}
+          onSelectChild={(childId) => void handleSelectChild(childId)}
+          onStartCreateChild={startCreateChild}
+          onStartCreateActivity={startCreateActivity}
           onChildDraftChange={(updater) => setChildDraft((current) => updater(current))}
-          onSubmit={handleSubmitChildProfile}
+          onActivityDraftChange={handleActivityDraftChange}
+          onSubmitChild={handleSubmitChildProfile}
+          onSubmitActivity={handleCreateActivity}
           onEditChild={beginEditChild}
           onDeleteChild={(child) => void handleDeleteChildProfile(child)}
-          onSelectChild={(childId) => void handleSelectChild(childId)}
-          onCancelEdit={() => setChildDraft((current) => emptyChildDraft(current.color))}
+          onCancelChildEdit={cancelChildEditor}
+          onEditRoutine={handleEditRoutine}
+          onEditChore={handleEditChore}
+          onDeleteActivity={(activity) => void handleDeleteActivity(activity)}
+          onCancelActivityEdit={cancelActivityEditor}
+          onActivityNameBlur={(value) => void handleGenerateInstructionalImage(value)}
+          onAddActivityStep={handleAddActivityStep}
+          onRemoveActivityStep={(stepIndex) =>
+            setActivityDraft((current) => ({
+              ...current,
+              steps: current.steps.filter((_, index) => index !== stepIndex)
+            }))
+          }
+          onUpdateActivityStepLabel={(stepIndex, value) =>
+            setActivityDraft((current) => ({
+              ...current,
+              steps: current.steps.map((step, index) =>
+                index === stepIndex
+                  ? {
+                      ...step,
+                      label: value
+                    }
+                  : step
+              )
+            }))
+          }
+          onToggleActivityDay={(day) =>
+            setActivityDraft((current) => ({
+              ...current,
+              selectedDays: toggleDay(current.selectedDays, day)
+            }))
+          }
         />
       ) : null}
 
       {activeRoute === "matrix" ? (
-        <section className="workspace-grid">
-          <ChildSelectorPanel
+        <section className="sticker-chart-shell">
+          <WeeklyMatrix
             childProfiles={state.childProfiles}
             selectedChildId={selectedChildId}
-            title="Pick the active child"
-            description="Choose which child to view in the weekly completion matrix."
-            onSelectChild={(childId) => void handleSelectChild(childId)}
-          />
-          <WeeklyMatrix
             rows={weeklyMatrixRows}
             currentDay={currentWeekday()}
-            currentDayNumber={currentDayNumber()}
+            dayNumbers={weekDayNumbers}
             artwork={weeklyMatrixArtwork}
-            onToggleCell={(row) => void handleToggleMatrixCell(row)}
-          />
-          <DashboardPanel
-            loading={loading}
-            selectedChild={selectedChild}
-            pendingApprovalCount={state.pendingApprovals.length}
-            rewards={state.rewards}
-            completedItems={completedItems}
-            incompleteItems={incompleteItems}
-            reviewItems={reviewItemNames}
-          />
-        </section>
-      ) : null}
-
-      {activeRoute === "activities" ? (
-        <section className="workspace-grid">
-          <ChildSelectorPanel
-            childProfiles={state.childProfiles}
-            selectedChildId={selectedChildId}
-            title="Plan activities"
-            description="Select a child, then create or edit routines and single-action activities."
             onSelectChild={(childId) => void handleSelectChild(childId)}
-          />
-          <ParentWorkspace
-            activityDraft={activityDraft}
-            selectedChildId={selectedChildId}
-            routines={state.routines}
-            chores={state.chores}
-            onActivityDraftChange={setActivityDraft}
-            onCreateActivity={handleCreateActivity}
-            onGenerateInstructionalImage={() => void handleGenerateInstructionalImage()}
-            onEditRoutine={handleEditRoutine}
-            onEditChore={handleEditChore}
-            onDeleteActivity={(activity) => void handleDeleteActivity(activity)}
-            onAddActivityStep={() =>
-              setActivityDraft((current) => ({
-                ...current,
-                steps: [
-                  ...current.steps,
-                  {
-                    label: "",
-                    icon: "",
-                    imageUrl: ""
-                  }
-                ]
-              }))
-            }
-            onUpdateActivityStep={(stepIndex, field, value) =>
-              setActivityDraft((current) => ({
-                ...current,
-                steps: current.steps.map((step, index) =>
-                  index === stepIndex
-                    ? {
-                        ...step,
-                        [field]: value
-                      }
-                    : step
-                )
-              }))
-            }
-            onToggleActivityDay={(day) =>
-              setActivityDraft((current) => ({
-                ...current,
-                selectedDays: toggleDay(current.selectedDays, day)
-              }))
-            }
+            onToggleCell={(row) => void handleToggleMatrixCell(row)}
           />
         </section>
       ) : null}
@@ -1046,38 +1189,6 @@ export default function App() {
           chores={state.chores}
           completions={state.completions}
         />
-      ) : null}
-
-      {activeRoute === "tablet" ? (
-        <section className="workspace-grid">
-          <article className="panel">
-            <header className="panel-header">
-              <div>
-                <p className="section-kicker">Tablet</p>
-                <h2>Child-safe execution</h2>
-              </div>
-            </header>
-            <label className="checkbox-inline">
-              <input
-                type="checkbox"
-                aria-label="Gentle celebration mode"
-                checked={celebrationMode === "gentle"}
-                onChange={(event) =>
-                  setCelebrationMode(event.target.checked ? "gentle" : "full")
-                }
-              />
-              <span>Gentle celebration mode</span>
-            </label>
-          </article>
-          <TabletStage
-            selectedChild={selectedChild}
-            activeTabletTask={activeTabletTask}
-            celebrationMode={celebrationMode}
-            tabletMessage={tabletMessage}
-            onCompleteRoutineStep={(task) => void handleCompleteRoutineStep(task)}
-            onCompleteChore={(task) => void handleCompleteChore(task)}
-          />
-        </section>
       ) : null}
 
       {celebrationOverlay ? (

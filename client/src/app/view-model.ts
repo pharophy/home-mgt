@@ -2,7 +2,7 @@ import { weekDays } from "./constants";
 import type { Chore, Completion, Routine, TabletTask, Weekday, WeeklyMatrixRow } from "./types";
 
 export function currentWeekday(dayIndex = new Date().getDay()): Weekday {
-  return weekDays[(dayIndex + 6) % 7]?.value ?? "monday";
+  return weekDays[dayIndex]?.value ?? "sunday";
 }
 
 export function toggleDay(days: Weekday[], day: Weekday): Weekday[] {
@@ -87,6 +87,12 @@ export function buildWeeklyMatrixRows({
       itemId: routine.id,
       childProfileId: routine.childProfileId,
       rewardType: routine.reward?.type ?? null,
+      imageUrl: routine.imageUrl || null,
+      steps: routine.steps.map((step) => ({
+        id: step.id,
+        label: step.label,
+        imageUrl: step.imageUrl || null
+      })),
       cells: weekDays.map((day) => {
         const completion = completions.find(
           (entry) =>
@@ -116,6 +122,8 @@ export function buildWeeklyMatrixRows({
       itemId: chore.id,
       childProfileId: chore.childProfileId,
       rewardType: chore.reward?.type ?? null,
+      imageUrl: chore.imageUrl || null,
+      steps: [],
       cells: weekDays.map((day) => {
         const completion = completions.find(
           (entry) =>
