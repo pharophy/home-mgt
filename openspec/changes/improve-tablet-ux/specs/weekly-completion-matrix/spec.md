@@ -29,3 +29,17 @@ The system SHALL show visible pending feedback as soon as a user taps an interac
 #### Scenario: Sticker generation is optimized for faster return
 - **WHEN** the system generates the celebratory sticker image for a valid Sticker Chart completion
 - **THEN** the generation path favors a faster configuration that preserves square sticker presentation and avoids a noticeable quality regression
+
+### Requirement: Earned Sticker controls SHALL separate viewing from deletion
+The system SHALL make post-generation Sticker Chart actions explicit so viewing a finished sticker does not risk deleting it.
+
+#### Scenario: User opens an earned sticker from the Sticker Chart
+- **WHEN** a user taps or clicks a finished celebratory sticker anywhere in the Sticker Chart week
+- **THEN** the system opens a maximized sticker view
+- **THEN** the viewing interaction does not delete the completion
+
+#### Scenario: User removes an earned sticker from the Sticker Chart
+- **WHEN** a user chooses to remove a finished current-day sticker from the Sticker Chart
+- **THEN** the system exposes a distinct delete control separate from the sticker preview itself
+- **THEN** the delete control remains visually secondary to the sticker artwork instead of dominating the cell
+- **THEN** activating that delete control removes the completion without requiring the user to tap the sticker image itself

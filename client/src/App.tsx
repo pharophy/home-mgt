@@ -45,6 +45,12 @@ type CelebrationOverlayState =
       imageUrl: string;
     };
 
+type StickerSpotlightState = {
+  activityName: string;
+  day: Weekday;
+  imageUrl: string;
+};
+
 type CompletionArtworkState = "pendingImage" | "imageReady" | "imageUnavailable";
 type ActivityDraftImageState = {
   activity: InstructionalImageState;
@@ -170,6 +176,7 @@ export default function App() {
   >({});
   const [celebrationOverlay, setCelebrationOverlay] =
     useState<CelebrationOverlayState | null>(null);
+  const [stickerSpotlight, setStickerSpotlight] = useState<StickerSpotlightState | null>(null);
   const pendingInstructionalBackfillKeys = useRef(new Set<string>());
   const pendingDraftPreviewKeys = useRef(new Set<string>());
   const pendingCompletionKeys = useRef(new Set<string>());
@@ -1119,6 +1126,38 @@ export default function App() {
     ...completionArtwork
   };
 
+  async function handleDeleteMatrixCompletion(args: {
+    row: (typeof weeklyMatrixRows)[number];
+    day: Weekday;
+    completionId: string;
+  }): Promise<void> {
+    const { row, day, completionId } = args;
+    const artworkKey = completionArtworkKey(row.childProfileId, day, row.id);
+
+    try {
+      await fetchJson<void>(`/api/completions/${completionId}`, {
+        method: "DELETE",
+        headers: actorHeaders
+      });
+
+      setState((current) => ({
+        ...current,
+        completions: current.completions.filter((entry) => entry.id !== completionId),
+        rewards: current.rewards.filter((reward) => reward.id !== completionId)
+      }));
+      setCompletionArtwork((current) => {
+        const next = { ...current };
+        delete next[artworkKey];
+        return next;
+      });
+      setStickerSpotlight((current) =>
+        current?.activityName === row.name && current.day === day ? null : current
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to unmark completion");
+    }
+  }
+
   async function handleToggleMatrixCell(row: (typeof weeklyMatrixRows)[number]): Promise<void> {
     const today = currentWeekday();
     const todayCell = row.cells.find((cell) => cell.day === today);
@@ -1134,26 +1173,11 @@ export default function App() {
     }
 
     if (todayCell.completed && todayCell.completionId) {
-      try {
-        await fetchJson<void>(`/api/completions/${todayCell.completionId}`, {
-          method: "DELETE",
-          headers: actorHeaders
-        });
-
-        setState((current) => ({
-          ...current,
-          completions: current.completions.filter((entry) => entry.id !== todayCell.completionId),
-          rewards: current.rewards.filter((reward) => reward.id !== todayCell.completionId)
-        }));
-        setCompletionArtwork((current) => {
-          const next = { ...current };
-          delete next[artworkKey];
-          return next;
-        });
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Unable to unmark completion");
-      }
-
+      await handleDeleteMatrixCompletion({
+        row,
+        day: today,
+        completionId: todayCell.completionId
+      });
       return;
     }
 
@@ -1389,6 +1413,12 @@ export default function App() {
             artwork={weeklyMatrixArtwork}
             onSelectChild={(childId) => void handleSelectChild(childId)}
             onToggleCell={(row) => void handleToggleMatrixCell(row)}
+            onOpenSticker={({ activityName, day, imageUrl }) =>
+              setStickerSpotlight({ activityName, day, imageUrl })
+            }
+            onDeleteSticker={({ row, day, completionId }) =>
+              void handleDeleteMatrixCompletion({ row, day, completionId })
+            }
           />
         </section>
       ) : null}
@@ -1433,6 +1463,31 @@ export default function App() {
                 alt={`Celebration spotlight for ${celebrationOverlay.activityName}`}
               />
             )}
+          </div>
+        </div>
+      ) : null}
+
+      {stickerSpotlight ? (
+        <div
+          className="celebration-overlay is-ready"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Sticker view for ${stickerSpotlight.activityName}`}
+        >
+          <div className="celebration-overlay-backdrop" onClick={() => setStickerSpotlight(null)} />
+          <div className="celebration-overlay-card history-spotlight-card">
+            <button
+              type="button"
+              className="secondary-button history-spotlight-close"
+              onClick={() => setStickerSpotlight(null)}
+            >
+              Close
+            </button>
+            <img
+              className="celebration-overlay-image completion-reveal"
+              src={stickerSpotlight.imageUrl}
+              alt={`Expanded sticker for ${stickerSpotlight.activityName}`}
+            />
           </div>
         </div>
       ) : null}

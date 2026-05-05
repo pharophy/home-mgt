@@ -17,6 +17,8 @@ type WeeklyMatrixProps = {
   artwork: Record<string, WeeklyMatrixArtwork | undefined>;
   onSelectChild: (childId: string) => void;
   onToggleCell: (row: WeeklyMatrixRow) => void;
+  onOpenSticker: (args: { activityName: string; day: Weekday; imageUrl: string }) => void;
+  onDeleteSticker: (args: { row: WeeklyMatrixRow; day: Weekday; completionId: string }) => void;
 };
 
 export function WeeklyMatrix({
@@ -27,7 +29,9 @@ export function WeeklyMatrix({
   dayNumbers,
   artwork,
   onSelectChild,
-  onToggleCell
+  onToggleCell,
+  onOpenSticker,
+  onDeleteSticker
 }: WeeklyMatrixProps) {
   const currentMonthLabel = new Date().toLocaleString("en-US", { month: "long" });
 
@@ -154,14 +158,31 @@ export function WeeklyMatrix({
                 const isCelebrating = art?.status === "imageReady";
                 const showImageOnly = art?.status === "imageReady" && Boolean(art.imageUrl);
                 const showStaticCompletedImage =
-                  !cell.interactive && cell.completed && art?.status === "imageReady" && Boolean(art.imageUrl);
+                  !cell.interactive &&
+                  cell.completed &&
+                  art?.status === "imageReady" &&
+                  Boolean(art.imageUrl);
+                const canDeleteSticker = cell.interactive && Boolean(cell.completionId) && showImageOnly;
 
                 return (
                   <td key={`${row.id}-${cell.day}`} data-today={cell.day === currentDay || undefined}>
                     {!cell.scheduled ? <span className="matrix-empty">-</span> : null}
                     {showStaticCompletedImage ? (
-                      <span className="matrix-cell-frame is-complete is-static">
-                        {renderCompletedArtwork(row, cell.day, art.imageUrl!)}
+                      <span className="matrix-cell-frame matrix-cell-complete is-complete is-static">
+                        <button
+                          type="button"
+                          className="matrix-sticker-preview-button"
+                          aria-label={`View sticker for ${row.name} on ${cell.day}`}
+                          onClick={() =>
+                            onOpenSticker({
+                              activityName: row.name,
+                              day: cell.day,
+                              imageUrl: art.imageUrl!
+                            })
+                          }
+                        >
+                          {renderCompletedArtwork(row, cell.day, art.imageUrl!)}
+                        </button>
                       </span>
                     ) : null}
                     {cell.scheduled && !cell.interactive && !showStaticCompletedImage ? (
@@ -181,49 +202,94 @@ export function WeeklyMatrix({
                       </span>
                     ) : null}
                     {cell.interactive ? (
-                      <button
-                        type="button"
-                        className={`matrix-cell-frame matrix-cell-button${isComplete ? " is-complete" : ""}${
-                          isCelebrating ? " is-celebrating" : ""
-                        }${!isComplete ? " is-actionable" : ""}`}
-                        aria-label={`Toggle ${row.name} for ${cell.day}`}
-                        disabled={isPending}
-                        onClick={() => onToggleCell(row)}
-                      >
-                        {showImageOnly ? renderCompletedArtwork(row, cell.day, art.imageUrl!) : null}
-                        {!showImageOnly ? (
+                      !isComplete ? (
+                        <button
+                          type="button"
+                          className={`matrix-cell-frame matrix-cell-button${isCelebrating ? " is-celebrating" : ""} is-actionable`}
+                          aria-label={`Toggle ${row.name} for ${cell.day}`}
+                          disabled={isPending}
+                          onClick={() => onToggleCell(row)}
+                        >
                           <span className="matrix-cell-stage">
-                            {renderRewardIcon(row, isComplete ? "complete" : "incomplete")}
-                            {!isComplete ? (
-                              <span
-                                className="visually-hidden"
-                                aria-label={`${
-                                  row.rewardType === "stickers" ? "Sticker" : "Star"
-                                } reward target for ${row.name}`}
+                            {renderRewardIcon(row, "incomplete")}
+                            <span
+                              className="visually-hidden"
+                              aria-label={`${
+                                row.rewardType === "stickers" ? "Sticker" : "Star"
+                              } reward target for ${row.name}`}
+                            >
+                              {row.rewardType === "stickers" ? "Sticker" : "Star"} reward target
+                            </span>
+                            <span
+                              className="matrix-cell-cta"
+                              style={{
+                                left: "0.25rem",
+                                right: "0.25rem",
+                                transform: "none",
+                                width: "auto",
+                                whiteSpace: "normal"
+                              }}
+                            >
+                              Tap to earn
+                            </span>
+                            {art?.status === "pendingImage" ? <span>Creating image...</span> : null}
+                          </span>
+                        </button>
+                      ) : showImageOnly ? (
+                        <div
+                          className={`matrix-cell-frame matrix-cell-complete${isCelebrating ? " is-celebrating" : ""}`}
+                        >
+                          <button
+                            type="button"
+                            className="matrix-sticker-preview-button"
+                            aria-label={`View sticker for ${row.name} on ${cell.day}`}
+                            onClick={() =>
+                              onOpenSticker({
+                                activityName: row.name,
+                                day: cell.day,
+                                imageUrl: art.imageUrl!
+                              })
+                            }
+                          >
+                            {renderCompletedArtwork(row, cell.day, art.imageUrl!)}
+                          </button>
+                          <div className="matrix-cell-actions">
+                            {canDeleteSticker ? (
+                              <button
+                                type="button"
+                                className="danger-button matrix-cell-action-button"
+                                aria-label={`Delete sticker for ${row.name} on ${cell.day}`}
+                                onClick={() =>
+                                  onDeleteSticker({
+                                    row,
+                                    day: cell.day,
+                                    completionId: cell.completionId!
+                                  })
+                                }
                               >
-                                {row.rewardType === "stickers" ? "Sticker" : "Star"} reward target
-                              </span>
+                                x
+                              </button>
                             ) : null}
-                            {!isComplete ? (
-                              <span
-                                className="matrix-cell-cta"
-                                style={{
-                                  left: "0.25rem",
-                                  right: "0.25rem",
-                                  transform: "none",
-                                  width: "auto",
-                                  whiteSpace: "normal"
-                                }}
-                              >
-                                Tap to earn
-                              </span>
-                            ) : null}
-                            {isComplete ? <span>Completed</span> : null}
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          className={`matrix-cell-frame matrix-cell-button is-complete${
+                            isCelebrating ? " is-celebrating" : ""
+                          }`}
+                          aria-label={`Toggle ${row.name} for ${cell.day}`}
+                          disabled={isPending}
+                          onClick={() => onToggleCell(row)}
+                        >
+                          <span className="matrix-cell-stage">
+                            {renderRewardIcon(row, "complete")}
+                            <span>Completed</span>
                             {art?.status === "pendingImage" ? <span>Creating image...</span> : null}
                             {art?.status === "imageUnavailable" ? <span>Image unavailable</span> : null}
                           </span>
-                        ) : null}
-                      </button>
+                        </button>
+                      )
                     ) : null}
                   </td>
                 );

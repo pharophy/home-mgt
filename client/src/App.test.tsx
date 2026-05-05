@@ -2289,13 +2289,17 @@ describe("App", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByRole("button", {
-        name: new RegExp(`toggle put dishes in dishwasher for ${today}`, "i")
+        name: new RegExp(`view sticker for put dishes in dishwasher on ${today}`, "i")
       })
-    ).toHaveClass("is-celebrating");
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", {
+        name: new RegExp(`delete sticker for put dishes in dishwasher on ${today}`, "i")
+      })
+    ).toBeInTheDocument();
     expect(
       screen.queryByLabelText(/sticker reward target for put dishes in dishwasher/i)
     ).not.toBeInTheDocument();
-    expect(screen.queryByText(/^Completed$/i)).not.toBeInTheDocument();
 
     await waitFor(() => {
       expect(
@@ -2307,7 +2311,7 @@ describe("App", () => {
 
     fireEvent.click(
       screen.getByRole("button", {
-        name: new RegExp(`toggle put dishes in dishwasher for ${today}`, "i")
+        name: new RegExp(`delete sticker for put dishes in dishwasher on ${today}`, "i")
       })
     );
 
@@ -2318,5 +2322,189 @@ describe("App", () => {
         expect.objectContaining({ method: "DELETE" })
       );
     });
+  });
+
+  it("opens a completed sticker in a maximized view and keeps deletion on a separate control", async () => {
+    const today = currentWeekday();
+    let resolveImageResponse!: (value: Response) => void;
+
+    fetchMock
+      .mockResolvedValueOnce(
+        stateResponse({
+          childProfiles: [
+            {
+              id: "child-1",
+              name: "Milo",
+              color: "#34D399",
+              motivators: ["race cars"]
+            }
+          ],
+          chores: [
+            {
+              id: "chore-1",
+              name: "put dishes in dishwasher",
+              childProfileId: "child-1",
+              recurrence: { days: [today] },
+              requiresApproval: false
+            }
+          ]
+        })
+      )
+      .mockResolvedValueOnce(todayPlanResponse())
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            id: "completion-1",
+            itemId: "chore-1",
+            itemType: "chore",
+            childProfileId: "child-1",
+            status: "completed",
+            scheduledDay: today
+          }),
+          { status: 201 }
+        )
+      )
+      .mockImplementationOnce(
+        () =>
+          new Promise<Response>((resolve) => {
+            resolveImageResponse = resolve;
+          })
+      )
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
+
+    render(<App />);
+
+    fireEvent.click(
+      await screen.findByRole("button", {
+        name: new RegExp(`toggle put dishes in dishwasher for ${today}`, "i")
+      })
+    );
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenNthCalledWith(
+        4,
+        "/api/completion-images",
+        expect.objectContaining({ method: "POST" })
+      );
+    });
+
+    resolveImageResponse(
+      new Response(
+        JSON.stringify({
+          imageUrl: "data:image/png;base64,celebration",
+          prompt: "prompt text",
+          selectedTheme: "race cars"
+        }),
+        { status: 200 }
+      )
+    );
+
+    expect(
+      await screen.findByRole("button", {
+        name: new RegExp(`view sticker for put dishes in dishwasher on ${today}`, "i")
+      })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", {
+        name: new RegExp(`delete sticker for put dishes in dishwasher on ${today}`, "i")
+      })
+    ).toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: new RegExp(`view sticker for put dishes in dishwasher on ${today}`, "i")
+      })
+    );
+
+    expect(
+      await screen.findByRole("dialog", {
+        name: /sticker view for put dishes in dishwasher/i
+      })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByAltText(/expanded sticker for put dishes in dishwasher/i)
+    ).toBeInTheDocument();
+    expect(
+      fetchMock.mock.calls.some(
+        ([url, init]) => url === "/api/completions/completion-1" && init?.method === "DELETE"
+      )
+    ).toBe(false);
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: new RegExp(`delete sticker for put dishes in dishwasher on ${today}`, "i")
+      })
+    );
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/completions/completion-1",
+        expect.objectContaining({ method: "DELETE" })
+      );
+    });
+  });
+
+  it("opens a saved sticker from an earlier day in the week without exposing a delete control there", async () => {
+    const today = currentWeekday();
+    const earlierDay = previousWeekday(today);
+
+    fetchMock
+      .mockResolvedValueOnce(
+        stateResponse({
+          childProfiles: [
+            {
+              id: "child-1",
+              name: "Milo",
+              color: "#34D399",
+              motivators: ["race cars"]
+            }
+          ],
+          chores: [
+            {
+              id: "chore-1",
+              name: "put dishes in dishwasher",
+              childProfileId: "child-1",
+              recurrence: { days: [earlierDay, today] },
+              requiresApproval: false
+            }
+          ],
+          completions: [
+            {
+              id: "completion-1",
+              itemId: "chore-1",
+              itemType: "chore",
+              childProfileId: "child-1",
+              status: "completed",
+              scheduledDay: earlierDay,
+              celebrationImageUrl: "data:image/png;base64,earlier-sticker",
+              completedAt: "2026-05-01T18:15:00.000Z"
+            }
+          ]
+        })
+      )
+      .mockResolvedValueOnce(todayPlanResponse());
+
+    render(<App />);
+
+    fireEvent.click(
+      await screen.findByRole("button", {
+        name: new RegExp(`view sticker for put dishes in dishwasher on ${earlierDay}`, "i")
+      })
+    );
+
+    expect(
+      await screen.findByRole("dialog", {
+        name: /sticker view for put dishes in dishwasher/i
+      })
+    ).toBeInTheDocument();
+    expect(screen.getByAltText(/expanded sticker for put dishes in dishwasher/i)).toHaveAttribute(
+      "src",
+      "data:image/png;base64,earlier-sticker"
+    );
+    expect(
+      screen.queryByRole("button", {
+        name: new RegExp(`delete sticker for put dishes in dishwasher on ${earlierDay}`, "i")
+      })
+    ).not.toBeInTheDocument();
   });
 });

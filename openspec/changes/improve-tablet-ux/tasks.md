@@ -17,6 +17,7 @@
 - [x] 3.3 Adapt Setup and History tablet layouts so content stacks cleanly and key actions remain reachable during scrolling.
 - [x] 3.4 Refine any existing touch-heavy surfaces responsively without introducing navigation or workflow differences between desktop and tablet.
 - [x] 3.5 Update backend sticker generation to use a faster completion-image configuration without noticeable quality loss.
+- [x] 3.6 Split completed Sticker Chart actions so tapping a finished sticker opens a maximized view and deletion uses a distinct control.
 
 ## 4. Verification
 

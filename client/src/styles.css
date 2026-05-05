@@ -1341,7 +1341,8 @@ button {
   border: 0;
 }
 
-.matrix-cell-button.is-complete {
+.matrix-cell-button.is-complete,
+.matrix-cell-complete {
   background: linear-gradient(135deg, #eef7f3, #fff7eb);
 }
 
@@ -1352,13 +1353,15 @@ button {
   animation: matrixTargetPulse 1.7s ease-in-out infinite;
 }
 
-.matrix-cell-button.is-celebrating {
+.matrix-cell-button.is-celebrating,
+.matrix-cell-complete.is-celebrating {
   position: relative;
   overflow: hidden;
   box-shadow: 0 0 0 2px rgba(245, 155, 63, 0.18);
 }
 
-.matrix-cell-button.is-celebrating::after {
+.matrix-cell-button.is-celebrating::after,
+.matrix-cell-complete.is-celebrating::after {
   content: "";
   position: absolute;
   inset: -18%;
@@ -1396,6 +1399,13 @@ button {
   background: linear-gradient(135deg, #f4f8ff, #fff7eb);
 }
 
+.matrix-cell-complete {
+  gap: 0.55rem;
+  align-content: stretch;
+  justify-items: stretch;
+  position: relative;
+}
+
 .matrix-cell-frame.is-static {
   padding: 0.4rem;
 }
@@ -1420,8 +1430,44 @@ button {
 }
 
 .matrix-cell-button .completion-art,
+.matrix-sticker-preview-button .completion-art,
 .matrix-cell-button .matrix-art {
   width: 100%;
+}
+
+.matrix-sticker-preview-button {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.matrix-sticker-preview-button .matrix-cell-stage {
+  width: min(100%, 9.5rem);
+}
+
+.matrix-cell-actions {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  display: flex;
+  gap: 0.35rem;
+  z-index: 2;
+}
+
+.matrix-cell-action-button {
+  min-width: 2rem;
+  min-height: 2rem;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 1.15rem;
+  line-height: 1;
+  box-shadow: 0 8px 18px rgba(36, 48, 66, 0.16);
 }
 
 .visually-hidden {
