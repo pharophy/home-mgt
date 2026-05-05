@@ -57,10 +57,20 @@ function previousWeekday(day: ReturnType<typeof currentWeekday>) {
   return weekOrder[(index + weekOrder.length - 1) % weekOrder.length];
 }
 
+function setViewportWidth(width: number) {
+  Object.defineProperty(window, "innerWidth", {
+    configurable: true,
+    writable: true,
+    value: width
+  });
+  window.dispatchEvent(new Event("resize"));
+}
+
 describe("App", () => {
   beforeEach(() => {
     fetchMock.mockReset();
     window.location.hash = "";
+    setViewportWidth(1280);
     delete (window as Window & { __enableInstructionalBackfill__?: boolean })
       .__enableInstructionalBackfill__;
     __setInstructionalImageGeneratorForTests(async ({ activityName, stepLabels }) => ({
@@ -1155,6 +1165,251 @@ describe("App", () => {
     });
 
     expect(await screen.findByAltText(/celebration image for carry napkins on/i)).toBeInTheDocument();
+  });
+
+  it("shows loading feedback immediately after a sticker chart reward target is tapped", async () => {
+    const today = currentWeekday();
+    let resolveCompletion!: (value: Response) => void;
+
+    fetchMock.mockImplementation(async (input) => {
+      const url = String(input);
+
+      if (url === "/api/state") {
+        return stateResponse({
+          childProfiles: [
+            {
+              id: "child-1",
+              name: "Milo",
+              color: "#34D399",
+              motivators: ["race cars"]
+            }
+          ],
+          chores: [
+            {
+              id: "chore-1",
+              name: "Carry napkins",
+              childProfileId: "child-1",
+              recurrence: { days: [today] },
+              requiresApproval: false
+            }
+          ]
+        });
+      }
+
+      if (url.startsWith("/api/today-plan")) {
+        return todayPlanResponse();
+      }
+
+      if (url === "/api/completions") {
+        return new Promise((resolve) => {
+          resolveCompletion = resolve;
+        });
+      }
+
+      if (url === "/api/completion-images") {
+        return new Response(
+          JSON.stringify({
+            imageUrl: "data:image/png;base64,celebration",
+            prompt: "prompt text",
+            selectedTheme: "race cars"
+          }),
+          { status: 200 }
+        );
+      }
+
+      return new Response(null, { status: 404 });
+    });
+
+    render(<App />);
+
+    fireEvent.click(
+      await screen.findByRole("button", {
+        name: new RegExp(`toggle carry napkins for ${today}`, "i")
+      })
+    );
+
+    expect(await screen.findByText(/creating image/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("dialog", {
+        name: /celebration for carry napkins/i
+      })
+    ).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      3,
+      "/api/completions",
+      expect.objectContaining({ method: "POST" })
+    );
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+
+    resolveCompletion(
+      new Response(
+        JSON.stringify({
+          id: "completion-1",
+          itemId: "chore-1",
+          itemType: "chore",
+          childProfileId: "child-1",
+          status: "completed",
+          scheduledDay: today
+        }),
+        { status: 201 }
+      )
+    );
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenNthCalledWith(
+        4,
+        "/api/completion-images",
+        expect.objectContaining({ method: "POST" })
+      );
+    });
+  });
+
+  it("allows the sticker chart tap-to-earn CTA to wrap on tablet-width screens", async () => {
+    const today = currentWeekday();
+    const originalWidth = window.innerWidth;
+    setViewportWidth(1024);
+
+    fetchMock
+      .mockResolvedValueOnce(
+        stateResponse({
+          childProfiles: [
+            {
+              id: "child-1",
+              name: "Milo",
+              color: "#34D399",
+              motivators: []
+            }
+          ],
+          chores: [
+            {
+              id: "chore-1",
+              name: "Carry napkins",
+              childProfileId: "child-1",
+              recurrence: { days: [today] },
+              requiresApproval: false
+            }
+          ]
+        })
+      )
+      .mockResolvedValueOnce(todayPlanResponse());
+
+    render(<App />);
+
+    const cta = await screen.findByText(/tap to earn/i);
+    expect(cta).toBeInTheDocument();
+    expect(cta.getAttribute("style")).toContain("left: 0.25rem;");
+    expect(cta.getAttribute("style")).toContain("right: 0.25rem;");
+    expect(cta.getAttribute("style")).toContain("transform: none;");
+    expect(cta.getAttribute("style")).toContain("white-space: normal;");
+
+    setViewportWidth(originalWidth);
+  });
+
+  it("uses the compact tablet layout for setup while preserving the same workflow", async () => {
+    setViewportWidth(1024);
+
+    fetchMock
+      .mockResolvedValueOnce(
+        stateResponse({
+          childProfiles: [
+            {
+              id: "child-1",
+              name: "Milo",
+              color: "#34D399",
+              motivators: ["race cars"]
+            }
+          ]
+        })
+      )
+      .mockResolvedValueOnce(todayPlanResponse());
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole("button", { name: /setup/i }));
+
+    const setupShell = screen.getByTestId("setup-shell");
+    expect(setupShell).toHaveClass("is-compact-tablet");
+    expect(screen.getByRole("button", { name: /children/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /activities/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /add new child/i })).toBeInTheDocument();
+  });
+
+  it("keeps setup editor actions in the compact tablet reachability treatment", async () => {
+    setViewportWidth(1024);
+
+    fetchMock
+      .mockResolvedValueOnce(
+        stateResponse({
+          childProfiles: [
+            {
+              id: "child-1",
+              name: "Milo",
+              color: "#34D399",
+              motivators: []
+            }
+          ]
+        })
+      )
+      .mockResolvedValueOnce(todayPlanResponse());
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole("button", { name: /setup/i }));
+    fireEvent.click(screen.getByRole("button", { name: /add new child/i }));
+
+    expect(screen.getByTestId("setup-editor-actions")).toHaveClass("is-compact-tablet");
+    expect(screen.getByRole("button", { name: /save child profile/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /cancel/i })).toBeInTheDocument();
+  });
+
+  it("uses the compact tablet layout for history while preserving the same workflow", async () => {
+    setViewportWidth(1024);
+
+    fetchMock
+      .mockResolvedValueOnce(
+        stateResponse({
+          childProfiles: [
+            {
+              id: "child-1",
+              name: "Milo",
+              color: "#34D399",
+              motivators: []
+            }
+          ],
+          chores: [
+            {
+              id: "chore-1",
+              name: "Put dishes in dishwasher",
+              childProfileId: "child-1",
+              recurrence: { days: ["monday"] },
+              requiresApproval: false
+            }
+          ],
+          completions: [
+            {
+              id: "completion-1",
+              itemId: "chore-1",
+              itemType: "chore",
+              childProfileId: "child-1",
+              status: "completed",
+              scheduledDay: "monday",
+              completedAt: "2026-05-02T17:15:00.000Z",
+              celebrationImageUrl: "data:image/png;base64,history-1"
+            }
+          ]
+        })
+      )
+      .mockResolvedValueOnce(todayPlanResponse());
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole("button", { name: /history/i }));
+
+    const historyShell = screen.getByTestId("history-layout");
+    expect(historyShell).toHaveClass("is-compact-tablet");
+    expect(screen.getByRole("button", { name: /month view/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /gallery view/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/filter history by child/i)).toBeInTheDocument();
   });
 
   it("records completion even when backend celebration imagery generation fails", async () => {

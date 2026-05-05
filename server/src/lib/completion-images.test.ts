@@ -53,3 +53,34 @@ test("fails fast when the OpenAI API key is missing", async () => {
     /OpenAI API key is not configured/
   );
 });
+
+test("uses the faster sticker generation model without lowering medium quality", async () => {
+  let capturedRequest: Record<string, unknown> | null = null;
+  const service = createCompletionImageService("test-key", {
+    client: {
+      images: {
+        generate: async (request: Record<string, unknown>) => {
+          capturedRequest = request;
+          return {
+            data: [{ b64_json: "celebration-image" }]
+          };
+        }
+      }
+    }
+  });
+
+  const result = await service.generateCelebrationImage({
+    childName: "Milo",
+    activityName: "Carry napkins",
+    interestThemes: ["race cars"],
+    celebrationMode: "full",
+    variantSeed: 1
+  });
+
+  assert.equal(result.imageUrl, "data:image/png;base64,celebration-image");
+  assert.ok(capturedRequest);
+  const generatedRequest = capturedRequest as Record<string, unknown>;
+  assert.equal(generatedRequest.model, "gpt-image-1-mini");
+  assert.equal(generatedRequest.size, "1024x1024");
+  assert.equal(generatedRequest.quality, "medium");
+});

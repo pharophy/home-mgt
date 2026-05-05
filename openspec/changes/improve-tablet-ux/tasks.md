@@ -1,26 +1,24 @@
 ## 1. Spec And Regression Coverage
 
-- [ ] 1.1 Add failing client tests for tablet launch and return behavior that preserve parent route and selected-child context.
-- [ ] 1.2 Add failing client tests for tablet-width parent workspace layouts, including reachable primary actions and visible context on Setup, Sticker Chart, or History.
-- [ ] 1.3 Add failing client tests for child-facing tablet portrait and landscape behavior with large reachable completion controls.
+- [x] 1.1 Add failing client tests for tablet-width parent workspace layouts, including reachable primary actions and visible context on Setup, Sticker Chart, or History.
+- [x] 1.2 Add failing client tests that confirm desktop and tablet keep the same routes, actions, and workflow order while layout presentation changes responsively.
+- [x] 1.3 Add failing client tests for touch-friendly control sizing and reachable action regions on tablet-sized screens.
+- [x] 1.4 Add failing client tests proving the Sticker Chart shows a loading state immediately after a reward target is tapped and does not require repeated taps during slow sticker generation.
 
 ## 2. Shared Tablet Ergonomics
 
-- [ ] 2.1 Introduce shared tablet layout primitives in the client styling layer for touch target sizing, safe-area spacing, and persistent action regions.
-- [ ] 2.2 Refactor parent-facing workspace containers to use the shared tablet ergonomics rules without regressing desktop behavior.
+- [x] 2.1 Introduce shared tablet layout primitives in the client styling layer for touch target sizing, safe-area spacing, and persistent action regions.
+- [x] 2.2 Refactor parent-facing workspace containers to use the shared tablet ergonomics rules without regressing desktop behavior.
 
-## 3. Navigation And Handoff
+## 3. Tablet Surface Updates
 
-- [ ] 3.1 Update parent-to-child tablet launch behavior so tablet mode preserves parent destination and selected-child context for return.
-- [ ] 3.2 Add an intentional exit path from child-facing tablet mode that restores the preserved parent context without exposing ambient admin navigation during child use.
+- [x] 3.1 Adapt the Sticker Chart for tablet-sized interaction, including readable context and touch-friendly current-day completion cells.
+- [x] 3.2 Update Sticker Chart completion handling so the tapped cell enters a visible pending/loading state immediately on click or tap.
+- [x] 3.3 Adapt Setup and History tablet layouts so content stacks cleanly and key actions remain reachable during scrolling.
+- [x] 3.4 Refine any existing touch-heavy surfaces responsively without introducing navigation or workflow differences between desktop and tablet.
+- [x] 3.5 Update backend sticker generation to use a faster completion-image configuration without noticeable quality loss.
 
-## 4. Tablet Surface Updates
+## 4. Verification
 
-- [ ] 4.1 Adapt the Sticker Chart for tablet-sized interaction, including readable context and touch-friendly current-day completion cells.
-- [ ] 4.2 Adapt Setup and History tablet layouts so content stacks cleanly and key actions remain reachable during scrolling.
-- [ ] 4.3 Refine the child-facing tablet stage for portrait and landscape orientations while preserving one dominant completion action.
-
-## 5. Verification
-
-- [ ] 5.1 Run `npm test --workspace client`.
-- [ ] 5.2 Run `openspec validate improve-tablet-ux --type change --strict --no-interactive`.
+- [x] 4.1 Run `npm test --workspace client`.
+- [x] 4.2 Run `openspec validate improve-tablet-ux --type change --strict --no-interactive`.

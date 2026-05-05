@@ -12,3 +12,8 @@ The system SHALL keep parent/admin planning, setup, and review surfaces readable
 - **WHEN** a parent/admin user scrolls a tablet-sized parent workspace with forms, lists, or history content
 - **THEN** the workspace keeps its primary action and feedback affordances reachable
 - **THEN** the surface does not require repeated full-page scrolling to save, switch context, or understand the current mode
+
+#### Scenario: Parent uses the same workspace on desktop and tablet
+- **WHEN** a parent/admin user opens the same workspace on desktop and tablet-sized screens
+- **THEN** the system preserves the same sections, actions, and workflow order
+- **THEN** the tablet adaptation changes layout density and ergonomics rather than introducing a different parent workflow

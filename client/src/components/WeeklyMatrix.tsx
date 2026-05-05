@@ -148,6 +148,7 @@ export function WeeklyMatrix({
               {row.cells.map((cell) => {
                 const artKey = `${row.childProfileId}:${cell.day}:${row.id}`;
                 const art = artwork[artKey];
+                const isPending = art?.status === "pendingImage";
                 const isComplete =
                   cell.completed || art?.status === "pendingImage" || art?.status === "imageReady";
                 const isCelebrating = art?.status === "imageReady";
@@ -186,6 +187,7 @@ export function WeeklyMatrix({
                           isCelebrating ? " is-celebrating" : ""
                         }${!isComplete ? " is-actionable" : ""}`}
                         aria-label={`Toggle ${row.name} for ${cell.day}`}
+                        disabled={isPending}
                         onClick={() => onToggleCell(row)}
                       >
                         {showImageOnly ? renderCompletedArtwork(row, cell.day, art.imageUrl!) : null}
@@ -202,7 +204,20 @@ export function WeeklyMatrix({
                                 {row.rewardType === "stickers" ? "Sticker" : "Star"} reward target
                               </span>
                             ) : null}
-                            {!isComplete ? <span className="matrix-cell-cta">Tap to earn</span> : null}
+                            {!isComplete ? (
+                              <span
+                                className="matrix-cell-cta"
+                                style={{
+                                  left: "0.25rem",
+                                  right: "0.25rem",
+                                  transform: "none",
+                                  width: "auto",
+                                  whiteSpace: "normal"
+                                }}
+                              >
+                                Tap to earn
+                              </span>
+                            ) : null}
                             {isComplete ? <span>Completed</span> : null}
                             {art?.status === "pendingImage" ? <span>Creating image...</span> : null}
                             {art?.status === "imageUnavailable" ? <span>Image unavailable</span> : null}

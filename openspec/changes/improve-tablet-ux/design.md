@@ -1,21 +1,23 @@
 ## Context
 
-The current client already distinguishes parent/admin workflows from the child-facing tablet stage, but the actual layouts still skew desktop-like in several places. Parent surfaces rely on multi-panel compositions and non-sticky controls, while the child-facing tablet stage and tablet launcher do not yet define how they should behave across portrait and landscape tablet sizes. Because this product is meant to be used on a shared household tablet, ergonomics on medium-width touch screens are not cosmetic polish; they directly affect whether the app feels usable in the kitchen, hallway, or bedtime routine context where the device is actually used.
+The current client already has the workflows it needs, but several surfaces still skew desktop-like in layout density and control sizing. Parent surfaces rely on multi-panel compositions and non-sticky controls, and some existing views do not yet define how they should adapt across portrait and landscape tablet sizes. The Sticker Chart also has a perceived-performance gap at the top of the interaction funnel: after a user taps a star, the UI can wait too long before showing that sticker generation is underway, which encourages repeated taps. Because this product is meant to be usable on tablet-class screens as well as desktop, the work should improve responsiveness and touch ergonomics without creating a device-specific product variant.
 
-This change crosses navigation, shared layout primitives, the Sticker Chart, parent workspaces, and the child-facing stage. It benefits from a design pass up front so the spec changes align around one tablet model instead of a set of unrelated CSS tweaks.
+This change crosses shared layout primitives, the Sticker Chart, parent workspaces, and possibly existing child-facing surfaces where touch ergonomics need improvement. It benefits from a design pass up front so the spec changes align around one responsive model instead of a set of unrelated CSS tweaks.
 
 ## Goals / Non-Goals
 
 **Goals:**
 - Establish a shared tablet UX baseline for touch targets, safe-area spacing, and reachable primary actions.
-- Preserve a clear parent-to-child handoff into tablet mode without promoting tablet mode into a permanent top-level parent destination.
-- Make core parent surfaces readable and operable on common tablet widths in both portrait and landscape usage.
-- Keep the child-facing task stage legible, tappable, and orientation-aware without exposing parent controls.
+- Keep desktop and tablet on the same routes, workflows, and information architecture.
+- Make core app surfaces readable and operable on common tablet widths in both portrait and landscape usage.
+- Improve touch ergonomics without introducing tablet-only features or navigation.
+- Make Sticker Chart completion feedback feel immediate so users do not re-tap while sticker generation is pending.
 
 **Non-Goals:**
 - Redesign the app for phones or very small mobile screens.
 - Introduce a brand new information architecture or additional user roles.
 - Replace the existing child/task data model or image-generation flows.
+- Split the app into separate desktop and tablet workflow variants.
 - Build a native app shell or platform-specific gesture system.
 
 ## Decisions
@@ -26,11 +28,11 @@ The client should define a small set of shared tablet layout rules in CSS and co
 Alternative considered:
 - Patch each screen independently. Rejected because it would produce inconsistent tap target sizes and repeated breakpoint logic across the app.
 
-### Preserve route/workspace context when launching child-facing tablet mode
-Entering tablet mode should preserve the parent’s current child selection and current parent destination so a parent can exit child mode and return to the same operational context. The launch path should remain secondary rather than a top-level tab.
+### Preserve the existing navigation and workflow model
+The responsive tablet work should not introduce new routes, launch paths, or device-specific workflow splits. Tablet should use the same navigation structure and the same user-facing jobs as desktop, with only layout and control ergonomics changing.
 
 Alternative considered:
-- Treat tablet mode as a fully separate route with no preserved return state. Rejected because shared-device handoff becomes clumsy for the common parent-child-parent loop.
+- Add tablet-specific navigation or a device-specific handoff model. Rejected because it creates a second product shape instead of improving the existing one.
 
 ### Favor tablet-specific layout adaptations over shrinking existing desktop panels
 For Setup, Sticker Chart, and History, the design should adapt panel composition at tablet widths rather than trying to squeeze every desktop panel into the same multi-column layout. Likely tactics include stacked sections, sticky child/context controls, horizontally scrollable chart regions with stable labels, and persistent action bars for save/complete actions.
@@ -38,32 +40,46 @@ For Setup, Sticker Chart, and History, the design should adapt panel composition
 Alternative considered:
 - Keep the existing layouts and only reduce spacing/font sizes. Rejected because that preserves the same interaction density that causes touch friction in the first place.
 
-### Keep child-facing tablet mode visually simple and orientation-aware
-The child stage should keep one dominant action, large artwork, and large completion controls while adapting its internal layout between portrait and landscape. Parent/admin affordances should remain absent except for an intentional exit affordance suitable for a shared tablet handoff.
+### Favor responsive adaptation over tablet-only behavior
+Where existing surfaces need improvement, the design should adapt spacing, stacking, scroll regions, and action placement responsively instead of changing the workflow itself. If the child-facing stage needs ergonomic improvements, they should preserve the same behavior and mental model already present on desktop-sized usage.
 
 Alternative considered:
-- Add more task metadata or secondary controls in tablet mode. Rejected because it increases distraction and weakens the non-reader-first interaction model.
+- Create tablet-only surface behavior that diverges from desktop. Rejected because the requirement is parity of behavior across device sizes.
+
+### Show optimistic pending feedback immediately on Sticker Chart completion
+The moment a user taps a current-day reward target, the Sticker Chart should switch that cell into a visible loading state before the sticker image request finishes. That gives immediate acknowledgement of the tap, reduces duplicate input, and improves perceived performance even if actual sticker generation remains unchanged.
+
+Alternative considered:
+- Wait for the completion request or image-generation request to resolve before showing loading feedback. Rejected because it leaves a dead period that users interpret as a missed tap.
+
+### Favor a faster sticker-generation model before lowering visible quality
+The completion-image path should first pursue lower latency by switching celebratory sticker generation from `gpt-image-1` to `gpt-image-1-mini` while keeping the square `1024x1024` and `medium` quality configuration. That targets faster turnaround with the smallest likely quality trade-off.
+
+Alternative considered:
+- Drop quality from `medium` to `low` on the existing model first. Rejected because it is more likely to cause a visible downgrade than a model change while still pursuing speed.
 
 ## Risks / Trade-offs
 
 - [Tablet breakpoints may overfit one device class] -> Mitigation: define requirements around usable behavior on common tablet widths rather than tying behavior to one exact resolution.
 - [Sticky controls can obscure content] -> Mitigation: reserve explicit safe-area-aware padding so fixed or sticky elements do not cover the final rows or form controls.
-- [Parent return context may become stale after data changes] -> Mitigation: preserve only lightweight route and selection context, then re-derive visible data from the current app state on return.
 - [Horizontal chart scrolling can hurt scanability] -> Mitigation: keep row labels and current context visible while limiting scroll to the matrix region rather than the whole page.
+- [Responsive tweaks may accidentally create behavior drift between desktop and tablet] -> Mitigation: keep tests focused on parity of workflow and route behavior while asserting only layout/ergonomic differences.
+- [Optimistic loading state may desync from failed completions] -> Mitigation: make the pending cell state resolve cleanly into completed, reverted, or unavailable states based on the actual completion result.
+- [Faster image configuration may reduce sticker quality] -> Mitigation: keep `medium` quality and square output while limiting the speed optimization to the completion-image path first.
 
 ## Migration Plan
 
-1. Add regression tests for tablet launch/return behavior, child-stage responsiveness, and tablet-width parent layouts.
-2. Introduce shared tablet layout primitives and responsive component updates behind the existing parent/tablet mode state.
-3. Update Sticker Chart, Setup, History, and tablet stage layouts to consume the shared tablet rules.
-4. Verify the tablet handoff still protects parent/admin controls during child use.
-5. Run client tests and strict OpenSpec validation before implementation is considered ready.
+1. Add regression tests for tablet-width layouts and parity of behavior across desktop and tablet usage.
+2. Introduce shared tablet layout primitives and responsive component updates without changing route or workflow state.
+3. Update Sticker Chart, Setup, History, and any existing touch-heavy surfaces to consume the shared tablet rules.
+4. Add immediate pending feedback for Sticker Chart completion clicks so loading appears at tap time rather than after a slow async gap.
+5. Verify that the same workflows remain available and behave the same across desktop and tablet breakpoints.
+6. Run client tests and strict OpenSpec validation before implementation is considered ready.
 
 Rollback strategy:
 - Revert the responsive/tablet-specific layout changes and return to the prior workspace compositions if the new tablet adaptations introduce instability.
 
 ## Open Questions
 
-- Whether the best tablet launch affordance belongs in the app header, child context area, or a dedicated secondary utility strip.
 - Whether History needs a distinct tablet card density mode in addition to general responsive layout changes.
 - Whether the Sticker Chart should prefer horizontal matrix scrolling or a partially condensed row presentation first on portrait tablets.

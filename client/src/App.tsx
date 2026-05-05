@@ -172,6 +172,7 @@ export default function App() {
     useState<CelebrationOverlayState | null>(null);
   const pendingInstructionalBackfillKeys = useRef(new Set<string>());
   const pendingDraftPreviewKeys = useRef(new Set<string>());
+  const pendingCompletionKeys = useRef(new Set<string>());
   const shouldBackfillInstructionalImages =
     import.meta.env.MODE !== "test" ||
     Boolean((window as Window & { __enableInstructionalBackfill__?: boolean }).__enableInstructionalBackfill__);
@@ -1128,6 +1129,10 @@ export default function App() {
     const artworkKey = completionArtworkKey(row.childProfileId, today, row.id);
     setError(null);
 
+    if (pendingCompletionKeys.current.has(artworkKey)) {
+      return;
+    }
+
     if (todayCell.completed && todayCell.completionId) {
       try {
         await fetchJson<void>(`/api/completions/${todayCell.completionId}`, {
@@ -1152,6 +1157,18 @@ export default function App() {
       return;
     }
 
+    pendingCompletionKeys.current.add(artworkKey);
+    setCompletionArtwork((current) => ({
+      ...current,
+      [artworkKey]: {
+        status: "pendingImage"
+      }
+    }));
+    setCelebrationOverlay({
+      status: "pending",
+      activityName: row.name
+    });
+
     try {
       const completion = await fetchJson<Completion>("/api/completions", {
         method: "POST",
@@ -1173,19 +1190,10 @@ export default function App() {
         ...current,
         completions: [...current.completions, completion]
       }));
-      setCompletionArtwork((current) => ({
-        ...current,
-        [artworkKey]: {
-          status: "pendingImage"
-        }
-      }));
-      setCelebrationOverlay({
-        status: "pending",
-        activityName: row.name
-      });
 
       const child = state.childProfiles.find((entry) => entry.id === row.childProfileId);
       if (!child) {
+        pendingCompletionKeys.current.delete(artworkKey);
         setCelebrationOverlay(null);
         return;
       }
@@ -1206,6 +1214,7 @@ export default function App() {
         })
       })
         .then((result) => {
+          pendingCompletionKeys.current.delete(artworkKey);
           setState((current) => ({
             ...current,
             completions: current.completions.map((entry) =>
@@ -1240,6 +1249,7 @@ export default function App() {
           });
         })
         .catch(() => {
+          pendingCompletionKeys.current.delete(artworkKey);
           setCompletionArtwork((current) => {
             if (!current[artworkKey]) {
               return current;
@@ -1255,6 +1265,12 @@ export default function App() {
           setCelebrationOverlay(null);
         });
     } catch (err) {
+      pendingCompletionKeys.current.delete(artworkKey);
+      setCompletionArtwork((current) => {
+        const next = { ...current };
+        delete next[artworkKey];
+        return next;
+      });
       setCelebrationOverlay(null);
       setError(err instanceof Error ? err.message : "Unable to record completion");
     }

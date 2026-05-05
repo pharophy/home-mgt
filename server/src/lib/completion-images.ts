@@ -6,6 +6,17 @@ import type {
   CompletionImageService
 } from "../domain/types.js";
 
+type ImageGenerationClient = {
+  images: {
+    generate(request: {
+      model: string;
+      prompt: string;
+      size: string;
+      quality: string;
+    }): Promise<{ data?: Array<{ b64_json?: string | null }> }>;
+  };
+};
+
 const completionVisualVariations = [
   "low-angle winner moment with confetti motion trails",
   "storybook badge ceremony with oversized reward sparkles",
@@ -68,7 +79,12 @@ export function buildCompletionImagePrompt({
   ].join(" ");
 }
 
-export function createCompletionImageService(apiKey: string | undefined): CompletionImageService {
+export function createCompletionImageService(
+  apiKey: string | undefined,
+  options: { client?: ImageGenerationClient } = {}
+): CompletionImageService {
+  const client = options.client ?? (apiKey ? new OpenAI({ apiKey }) : null);
+
   return {
     async generateCelebrationImage(
       request: CompletionImageRequest
@@ -76,8 +92,6 @@ export function createCompletionImageService(apiKey: string | undefined): Comple
       if (!apiKey) {
         throw new Error("OpenAI API key is not configured");
       }
-
-      const client = new OpenAI({ apiKey });
       const variantSeed = request.variantSeed ?? Date.now();
       const selectedTheme = selectCompletionTheme(
         request.interestThemes,
@@ -92,8 +106,8 @@ export function createCompletionImageService(apiKey: string | undefined): Comple
         visualVariation
       });
 
-      const response = await client.images.generate({
-        model: "gpt-image-1",
+      const response = await client!.images.generate({
+        model: "gpt-image-1-mini",
         prompt,
         size: "1024x1024",
         quality: "medium"

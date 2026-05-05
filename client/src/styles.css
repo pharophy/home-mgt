@@ -154,6 +154,7 @@ button {
   padding: 0.75rem 1rem;
   background: #f4f7fb;
   font-weight: 700;
+  min-height: 2.9rem;
 }
 
 .mode-switch button[aria-pressed="true"] {
@@ -274,6 +275,10 @@ button {
   gap: 1.25rem;
 }
 
+.setup-shell.is-compact-tablet {
+  gap: 1rem;
+}
+
 .setup-nav-panel,
 .setup-list-panel,
 .setup-editor-panel {
@@ -309,6 +314,11 @@ button {
   gap: 1rem;
   align-items: start;
   margin-bottom: 1rem;
+}
+
+.panel-header.is-compact-tablet {
+  flex-direction: column;
+  align-items: stretch;
 }
 
 .sticker-chart-header {
@@ -364,6 +374,7 @@ button {
   border-radius: 14px;
   padding: 0.75rem 0.9rem;
   background: #fffdf9;
+  min-height: 2.9rem;
 }
 
 .stack-form button,
@@ -377,6 +388,7 @@ button {
   background: linear-gradient(135deg, #f7a34b, #ef6f4f);
   color: white;
   font-weight: 700;
+  min-height: 2.9rem;
 }
 
 .stack-form button:disabled {
@@ -398,6 +410,7 @@ button {
   border-radius: 14px;
   padding: 0.75rem 0.95rem;
   font-weight: 700;
+  min-height: 2.9rem;
 }
 
 .secondary-button {
@@ -434,6 +447,7 @@ button {
   padding: 0.7rem 0.9rem;
   background: #fff7ee;
   color: inherit;
+  min-height: 2.9rem;
 }
 
 .child-chip.selected {
@@ -494,6 +508,29 @@ button {
 .entity-card {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
+}
+
+.setup-shell.is-compact-tablet .entity-card {
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+.setup-shell.is-compact-tablet .entity-actions,
+.setup-shell.is-compact-tablet .button-row {
+  width: 100%;
+}
+
+.setup-shell.is-compact-tablet .entity-actions > *,
+.setup-shell.is-compact-tablet .button-row > * {
+  flex: 1 1 12rem;
+}
+
+.setup-shell.is-compact-tablet .button-row.is-compact-tablet {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  padding: 0.85rem 0 max(env(safe-area-inset-bottom), 0);
+  background: linear-gradient(180deg, rgba(255, 253, 249, 0), rgba(255, 253, 249, 0.96) 28%);
 }
 
 .entity-card-image {
@@ -574,6 +611,34 @@ button {
   grid-template-columns: 1fr;
 }
 
+.history-layout.is-compact-tablet .history-controls {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.history-layout.is-compact-tablet .history-filter-field select,
+.history-layout.is-compact-tablet .segmented-control {
+  width: 100%;
+}
+
+.history-layout.is-compact-tablet .segmented-control {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.history-layout.is-compact-tablet .history-month-toolbar {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.history-layout.is-compact-tablet .history-calendar {
+  gap: 0.35rem;
+}
+
+.history-layout.is-compact-tablet .history-calendar-cell {
+  min-height: 6.6rem;
+  padding: 0.45rem;
+}
+
 .history-controls {
   display: flex;
   align-items: flex-end;
@@ -601,6 +666,7 @@ button {
   border-radius: 14px;
   padding: 0.75rem 0.9rem;
   background: #fffdf9;
+  min-height: 2.9rem;
 }
 
 .history-month-shell {
@@ -1337,8 +1403,9 @@ button {
 .matrix-cell-cta {
   position: absolute;
   bottom: 0.65rem;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0.25rem;
+  right: 0.25rem;
+  width: auto;
   padding: 0.2rem 0.55rem;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.82);
@@ -1347,7 +1414,9 @@ button {
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  white-space: nowrap;
+  text-align: center;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
 }
 
 .matrix-cell-button .completion-art,

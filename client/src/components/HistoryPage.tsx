@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 
+import { useCompactTablet } from "../app/use-compact-tablet";
 import type { ChildProfile, Chore, Completion, Routine } from "../app/types";
 
 type HistoryPageProps = {
@@ -76,6 +77,7 @@ export function HistoryPage({
   chores,
   completions
 }: HistoryPageProps) {
+  const isCompactTablet = useCompactTablet();
   const stickerHistory = completions
     .filter((completion) => Boolean(completion.celebrationImageUrl))
     .slice()
@@ -259,9 +261,12 @@ export function HistoryPage({
   }
 
   return (
-    <section className="workspace-grid history-layout">
+    <section
+      className={`workspace-grid history-layout${isCompactTablet ? " is-compact-tablet" : ""}`}
+      data-testid="history-layout"
+    >
       <article className="panel history-panel">
-        <header className="panel-header">
+        <header className={`panel-header${isCompactTablet ? " is-compact-tablet" : ""}`}>
           <div>
             <p className="section-kicker">History</p>
             <h2>Sticker history</h2>

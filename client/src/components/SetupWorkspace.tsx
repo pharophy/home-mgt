@@ -1,6 +1,7 @@
 import type { CSSProperties, FormEvent } from "react";
 
 import { weekDays } from "../app/constants";
+import { useCompactTablet } from "../app/use-compact-tablet";
 import type {
   ActivityDraft,
   ChildProfile,
@@ -82,6 +83,7 @@ export function SetupWorkspace({
   onUpdateActivityStepLabel,
   onToggleActivityDay
 }: SetupWorkspaceProps) {
+  const isCompactTablet = useCompactTablet();
   const selectedChild =
     childProfiles.find((child) => child.id === selectedChildId) ?? null;
 
@@ -113,9 +115,12 @@ export function SetupWorkspace({
   }
 
   return (
-    <section className="setup-shell">
+    <section
+      className={`setup-shell${isCompactTablet ? " is-compact-tablet" : ""}`}
+      data-testid="setup-shell"
+    >
       <article className="panel setup-nav-panel">
-        <header className="panel-header">
+        <header className={`panel-header${isCompactTablet ? " is-compact-tablet" : ""}`}>
           <div>
             <p className="section-kicker">Setup</p>
             <h2>Manage household data</h2>
@@ -142,7 +147,7 @@ export function SetupWorkspace({
       {section === "children" ? (
         childEditorOpen ? (
           <article className="panel setup-editor-panel">
-            <header className="panel-header">
+            <header className={`panel-header${isCompactTablet ? " is-compact-tablet" : ""}`}>
               <div>
                 <p className="section-kicker">Children</p>
                 <h2>{childDraft.editingChildId ? "Edit child profile" : "Add new child"}</h2>
@@ -188,7 +193,10 @@ export function SetupWorkspace({
                   placeholder="race cars, energetic blue cartoon dogs"
                 />
               </label>
-              <div className="button-row">
+              <div
+                className={`button-row${isCompactTablet ? " is-compact-tablet" : ""}`}
+                data-testid="setup-editor-actions"
+              >
                 <button type="submit">
                   {childDraft.editingChildId ? "Update child profile" : "Save child profile"}
                 </button>
@@ -200,7 +208,7 @@ export function SetupWorkspace({
           </article>
         ) : (
           <article className="panel setup-list-panel">
-            <header className="panel-header">
+            <header className={`panel-header${isCompactTablet ? " is-compact-tablet" : ""}`}>
               <div>
                 <p className="section-kicker">Children</p>
                 <h2>Child profiles</h2>
@@ -265,7 +273,7 @@ export function SetupWorkspace({
       {section === "activities" ? (
         activityEditorOpen ? (
           <article className="panel setup-editor-panel">
-            <header className="panel-header">
+            <header className={`panel-header${isCompactTablet ? " is-compact-tablet" : ""}`}>
               <div>
                 <p className="section-kicker">Activities</p>
                 <h2>{activityDraft.editingActivityId ? "Edit activity" : "Add new activity"}</h2>
@@ -388,7 +396,10 @@ export function SetupWorkspace({
                 </button>
               </div>
 
-              <div className="button-row">
+              <div
+                className={`button-row${isCompactTablet ? " is-compact-tablet" : ""}`}
+                data-testid="setup-editor-actions"
+              >
                 <button type="submit" disabled={!selectedChildId}>
                   {activityDraft.editingActivityId ? "Update activity" : "Save activity"}
                 </button>
