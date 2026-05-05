@@ -85,6 +85,7 @@ export function HistoryPage({
   const [view, setView] = useState<HistoryView>("month");
   const [selectedChildId, setSelectedChildId] = useState("all");
   const [spotlightIndex, setSpotlightIndex] = useState<number | null>(null);
+  const [loadedImageKeys, setLoadedImageKeys] = useState<Record<string, boolean>>({});
   const [visibleMonth, setVisibleMonth] = useState(
     latestBucket?.key.slice(0, 7) ?? new Date().toISOString().slice(0, 7)
   );
@@ -142,6 +143,13 @@ export function HistoryPage({
   const spotlightItem =
     spotlightIndex !== null ? spotlightItems[spotlightIndex] ?? null : null;
 
+  function markImageLoaded(key: string) {
+    setLoadedImageKeys((current) => ({
+      ...current,
+      [key]: true
+    }));
+  }
+
   const calendarCells = useMemo(() => {
     const [year, month] = visibleMonth.split("-").map(Number);
     const firstDay = new Date(year, (month ?? 1) - 1, 1);
@@ -169,6 +177,41 @@ export function HistoryPage({
     return cells;
   }, [filteredDateBuckets, visibleMonth]);
 
+  function renderProgressiveStickerImage({
+    imageKey,
+    imageUrl,
+    alt,
+    placeholderLabel,
+    className
+  }: {
+    imageKey: string;
+    imageUrl: string | undefined;
+    alt: string;
+    placeholderLabel: string;
+    className?: string;
+  }) {
+    const isLoaded = Boolean(loadedImageKeys[imageKey]);
+
+    return (
+      <span className={`history-image-shell${isLoaded ? " is-loaded" : ""}`}>
+        {!isLoaded ? (
+          <span
+            className="history-image-placeholder"
+            aria-label={placeholderLabel}
+          />
+        ) : null}
+        <img
+          className={`${className ?? ""}${isLoaded ? " is-loaded" : ""}`.trim()}
+          src={imageUrl}
+          alt={alt}
+          loading="lazy"
+          onLoad={() => markImageLoaded(imageKey)}
+          onError={() => markImageLoaded(imageKey)}
+        />
+      </span>
+    );
+  }
+
   function renderHistoryCards(items: Completion[], immersive = false) {
     return (
       <ul
@@ -195,7 +238,12 @@ export function HistoryPage({
                 aria-label={`View saved sticker for ${activityName}`}
                 onClick={() => setSpotlightIndex(index)}
               >
-                <img src={completion.celebrationImageUrl} alt={`Saved sticker for ${activityName}`} />
+                {renderProgressiveStickerImage({
+                  imageKey: `gallery:${completion.id}`,
+                  imageUrl: completion.celebrationImageUrl,
+                  alt: `Saved sticker for ${activityName}`,
+                  placeholderLabel: `Loading saved sticker for ${activityName}`
+                })}
               </button>
               <div className={`history-copy${immersive ? " history-copy--overlay" : ""}`}>
                 <strong>{activityName}</strong>
@@ -316,12 +364,15 @@ export function HistoryPage({
                               .map((completion) => {
                                 const activityName = resolveActivityName(completion, routines, chores);
                                 return (
-                                  <img
-                                    key={completion.id}
-                                    className="history-calendar-preview"
-                                    src={completion.celebrationImageUrl}
-                                    alt={`Sticker earned on ${cell.label} for ${activityName}`}
-                                  />
+                                  <span key={completion.id} className="history-calendar-preview-wrap">
+                                    {renderProgressiveStickerImage({
+                                      imageKey: `calendar:${completion.id}`,
+                                      imageUrl: completion.celebrationImageUrl,
+                                      alt: `Sticker earned on ${cell.label} for ${activityName}`,
+                                      placeholderLabel: `Loading sticker earned on ${cell.label} for ${activityName}`,
+                                      className: "history-calendar-preview"
+                                    })}
+                                  </span>
                                 );
                               })}
                           </span>

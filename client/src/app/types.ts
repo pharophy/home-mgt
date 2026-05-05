@@ -109,6 +109,8 @@ export type WeekDayOption = {
   label: string;
 };
 
+export type InstructionalImageState = "idle" | "pending" | "ready" | "unavailable";
+
 export type ChildChipStyle = CSSProperties;
 
 export type WeeklyMatrixCell = {

@@ -112,9 +112,22 @@ button {
 }
 
 .feedback {
-  margin: 0 0 1rem;
+  margin: 0;
   padding: 0.9rem 1rem;
   border-radius: 18px;
+  box-shadow: 0 14px 32px rgba(36, 48, 66, 0.16);
+}
+
+.feedback-stack {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  z-index: 40;
+  display: grid;
+  gap: 0.65rem;
+  width: min(92vw, 42rem);
+  transform: translateX(-50%);
+  pointer-events: none;
 }
 
 .feedback.success {
@@ -676,6 +689,25 @@ button {
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.72);
   box-shadow: 0 8px 16px rgba(36, 48, 66, 0.12);
+  opacity: 0;
+  transition: opacity 180ms ease-out;
+}
+
+.history-calendar-preview-wrap,
+.history-image-shell {
+  display: block;
+  position: relative;
+  width: 100%;
+}
+
+.history-image-placeholder {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(135deg, rgba(255, 248, 239, 0.96), rgba(238, 246, 255, 0.96)),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.18));
+  animation: historyPlaceholderPulse 1.1s ease-in-out infinite alternate;
 }
 
 .history-day-list {
@@ -768,11 +800,18 @@ button {
   object-fit: cover;
   border-radius: 18px;
   background: #f4f7fb;
+  opacity: 0;
+  transition: opacity 180ms ease-out;
 }
 
 .history-card--immersive img {
   display: block;
   border-radius: 0;
+}
+
+.history-card img.is-loaded,
+.history-calendar-preview.is-loaded {
+  opacity: 1;
 }
 
 .history-card--feature img {
@@ -884,6 +923,26 @@ button {
   display: block;
   width: 100%;
   max-width: 320px;
+}
+
+.completion-art-placeholder,
+.completion-art-unavailable {
+  display: grid;
+  place-items: center;
+  min-height: 14rem;
+  color: #526173;
+  font-weight: 700;
+}
+
+.completion-art-placeholder {
+  background:
+    linear-gradient(135deg, rgba(255, 248, 239, 0.9), rgba(238, 246, 255, 0.95)),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.24));
+}
+
+.completion-art-unavailable {
+  background: linear-gradient(135deg, #f8ece7, #f5f0ea);
+  color: #8b5a3d;
 }
 
 .completion-reveal {
@@ -1003,6 +1062,16 @@ button {
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes historyPlaceholderPulse {
+  from {
+    opacity: 0.72;
+  }
+
+  to {
+    opacity: 1;
   }
 }
 

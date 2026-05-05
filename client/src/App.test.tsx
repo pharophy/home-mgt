@@ -246,18 +246,202 @@ describe("App", () => {
     ).toMatchObject({
       childProfileId: "child-1",
       name: "Morning helper",
-      imageUrl: "data:image/svg+xml;instructional",
       schedule: {
         days: ["monday"]
       },
       steps: [
         {
           label: "Get dressed",
-          icon: "",
-          imageUrl: "data:image/svg+xml;instructional"
+          icon: ""
         }
       ]
     });
+  });
+
+  it("saves a valid activity before instructional images finish generating", async () => {
+    let resolveInstructionalImage!: (value: {
+      imageUrl: string;
+      prompt: string;
+    }) => void;
+
+    __setInstructionalImageGeneratorForTests(
+      () =>
+        new Promise((resolve) => {
+          resolveInstructionalImage = resolve;
+        })
+    );
+
+    fetchMock
+      .mockResolvedValueOnce(
+        stateResponse({
+          childProfiles: [
+            {
+              id: "child-1",
+              name: "Milo",
+              color: "#60A5FA",
+              motivators: []
+            }
+          ]
+        })
+      )
+      .mockResolvedValueOnce(todayPlanResponse())
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            id: "routine-1",
+            name: "Morning helper",
+            childProfileId: "child-1",
+            imageUrl: "",
+            schedule: { days: ["monday"] },
+            steps: [{ id: "step-1", label: "Get dressed", order: 0, imageUrl: "" }]
+          }),
+          { status: 201 }
+        )
+      );
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole("button", { name: /setup/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^activities$/i }));
+    fireEvent.click(screen.getByRole("button", { name: /add new activity/i }));
+    fireEvent.change(screen.getByLabelText(/activity name/i), {
+      target: { value: "Morning helper" }
+    });
+    fireEvent.click(screen.getByRole("button", { name: /add step/i }));
+    fireEvent.change(screen.getByLabelText(/step 1 name/i), {
+      target: { value: "Get dressed" }
+    });
+    fireEvent.click(screen.getByRole("checkbox", { name: /monday activity/i }));
+    fireEvent.click(screen.getByRole("button", { name: /save activity/i }));
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenNthCalledWith(
+        3,
+        "/api/routines",
+        expect.objectContaining({
+          method: "POST"
+        })
+      );
+    });
+
+    expect(await screen.findByText(/activity saved/i)).toBeInTheDocument();
+    expect(screen.getByText(/generating image/i)).toBeInTheDocument();
+
+    resolveInstructionalImage({
+      imageUrl: "data:image/svg+xml;instructional-finished",
+      prompt: "finished prompt"
+    });
+  });
+
+  it("shows a saved activity image on the sticker chart after background generation finishes", async () => {
+    let resolveInstructionalImage!: (value: {
+      imageUrl: string;
+      prompt: string;
+    }) => void;
+
+    (window as Window & { __enableInstructionalBackfill__?: boolean }).__enableInstructionalBackfill__ = true;
+
+    __setInstructionalImageGeneratorForTests(
+      () =>
+        new Promise((resolve) => {
+          resolveInstructionalImage = resolve;
+        })
+    );
+
+    fetchMock.mockImplementation(async (input, init) => {
+      const url = String(input);
+
+      if (url === "/api/state") {
+        return stateResponse({
+          childProfiles: [
+            {
+              id: "child-1",
+              name: "Milo",
+              color: "#60A5FA",
+              motivators: []
+            }
+          ]
+        });
+      }
+
+      if (url.startsWith("/api/today-plan")) {
+        return todayPlanResponse();
+      }
+
+      if (url === "/api/chores" && init?.method === "POST") {
+        return new Response(
+          JSON.stringify({
+            id: "chore-1",
+            name: "Carry napkins",
+            childProfileId: "child-1",
+            imageUrl: "",
+            recurrence: { days: ["monday"] },
+            requiresApproval: false
+          }),
+          { status: 201 }
+        );
+      }
+
+      if (url === "/api/chores/chore-1" && init?.method === "PATCH") {
+        return new Response(
+          JSON.stringify({
+            id: "chore-1",
+            name: "Carry napkins",
+            childProfileId: "child-1",
+            imageUrl: "data:image/svg+xml;background-finished",
+            recurrence: { days: ["monday"] },
+            requiresApproval: false
+          }),
+          { status: 200 }
+        );
+      }
+
+      return new Response(null, { status: 204 });
+    });
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole("button", { name: /setup/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^activities$/i }));
+    fireEvent.click(screen.getByRole("button", { name: /add new activity/i }));
+    fireEvent.change(screen.getByLabelText(/activity name/i), {
+      target: { value: "Carry napkins" }
+    });
+    fireEvent.click(screen.getByRole("checkbox", { name: /monday activity/i }));
+    fireEvent.click(screen.getByRole("button", { name: /save activity/i }));
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/chores",
+        expect.objectContaining({
+          method: "POST"
+        })
+      );
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /sticker chart/i }));
+
+    expect(await screen.findByText("Carry napkins")).toBeInTheDocument();
+    expect(screen.queryByAltText(/picture for carry napkins/i)).not.toBeInTheDocument();
+
+    resolveInstructionalImage({
+      imageUrl: "data:image/svg+xml;background-finished",
+      prompt: "background-finished"
+    });
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/chores/chore-1",
+        expect.objectContaining({
+          method: "PATCH"
+        })
+      );
+    });
+
+    expect(await screen.findByAltText(/picture for carry napkins/i)).toHaveAttribute(
+      "src",
+      "data:image/svg+xml;background-finished"
+    );
   });
 
   it("uses the unified activity flow to create a single-action activity with approval", async () => {
@@ -308,7 +492,6 @@ describe("App", () => {
             body: JSON.stringify({
               childProfileId: "child-1",
               name: "Carry napkins",
-              imageUrl: "data:image/svg+xml;Carry%20napkins%3A",
               recurrence: {
                 days: ["monday"]
               },
@@ -349,6 +532,48 @@ describe("App", () => {
     expect(
       screen.getByText(/select at least one scheduled day before saving this activity/i)
     ).toBeInTheDocument();
+  });
+
+  it("shows pending and unavailable instructional-image states in activity authoring", async () => {
+    let rejectInstructionalImage!: (reason?: unknown) => void;
+
+    __setInstructionalImageGeneratorForTests(
+      () =>
+        new Promise((_, reject) => {
+          rejectInstructionalImage = reject;
+        })
+    );
+
+    fetchMock
+      .mockResolvedValueOnce(
+        stateResponse({
+          childProfiles: [
+            {
+              id: "child-1",
+              name: "Milo",
+              color: "#34D399",
+              motivators: []
+            }
+          ]
+        })
+      )
+      .mockResolvedValueOnce(todayPlanResponse());
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole("button", { name: /setup/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^activities$/i }));
+    fireEvent.click(screen.getByRole("button", { name: /add new activity/i }));
+    fireEvent.change(screen.getByLabelText(/activity name/i), {
+      target: { value: "Carry napkins" }
+    });
+    fireEvent.blur(screen.getByLabelText(/activity name/i));
+
+    expect(await screen.findByText(/generating image/i)).toBeInTheDocument();
+
+    rejectInstructionalImage(new Error("generation failed"));
+
+    expect(await screen.findByText(/image unavailable/i)).toBeInTheDocument();
   });
 
   it("shows the server validation message when a task save is rejected", async () => {
@@ -1656,6 +1881,55 @@ describe("App", () => {
       await screen.findByRole("dialog", { name: /sticker spotlight for feed the cat/i })
     ).toBeInTheDocument();
     expect(screen.getByAltText(/spotlight sticker for feed the cat/i)).toBeInTheDocument();
+  });
+
+  it("renders history structure before sticker images finish loading", async () => {
+    fetchMock
+      .mockResolvedValueOnce(
+        stateResponse({
+          childProfiles: [
+            {
+              id: "child-1",
+              name: "Milo",
+              color: "#34D399",
+              motivators: []
+            }
+          ],
+          chores: [
+            {
+              id: "chore-1",
+              name: "Put dishes in dishwasher",
+              childProfileId: "child-1",
+              recurrence: { days: ["monday"] },
+              requiresApproval: false
+            }
+          ],
+          completions: [
+            {
+              id: "completion-1",
+              itemId: "chore-1",
+              itemType: "chore",
+              childProfileId: "child-1",
+              status: "completed",
+              scheduledDay: "monday",
+              completedAt: "2026-05-02T17:15:00.000Z",
+              celebrationImageUrl: "data:image/png;base64,history-1"
+            }
+          ]
+        })
+      )
+      .mockResolvedValueOnce(todayPlanResponse());
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole("button", { name: /history/i }));
+
+    expect(await screen.findByRole("grid", { name: /sticker calendar for may 2026/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/loading sticker earned on may 2, 2026 for put dishes in dishwasher/i)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /gallery view/i }));
+    expect(await screen.findByRole("list")).toBeInTheDocument();
+    expect(screen.getByLabelText(/loading saved sticker for put dishes in dishwasher/i)).toBeInTheDocument();
   });
 
   it("toggles only today's matrix cell and shows celebration art in that cell", async () => {

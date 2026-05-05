@@ -13,6 +13,7 @@ import type {
   ChildProfileDraft,
   Chore,
   Completion,
+  InstructionalImageState,
   Routine,
   SetupSection,
   TodayPlan,
@@ -45,8 +46,23 @@ type CelebrationOverlayState =
     };
 
 type CompletionArtworkState = "pendingImage" | "imageReady" | "imageUnavailable";
+type ActivityDraftImageState = {
+  activity: InstructionalImageState;
+  steps: Record<number, InstructionalImageState>;
+};
 
 const celebrationOverlayDurationMs = 1600;
+
+function emptyActivityDraftImageState(): ActivityDraftImageState {
+  return {
+    activity: "idle",
+    steps: {}
+  };
+}
+
+function activityImageStatusKey(type: "routine" | "chore", id: string): string {
+  return `${type}:${id}`;
+}
 
 function emptyChildDraft(color = "#F59E0B"): ChildProfileDraft {
   return {
@@ -140,6 +156,12 @@ export default function App() {
   const [celebrationMode] = useState<CelebrationMode>("full");
   const [childDraft, setChildDraft] = useState<ChildProfileDraft>(emptyChildDraft());
   const [activityDraft, setActivityDraft] = useState<ActivityDraft>(emptyActivityDraft());
+  const [activityDraftImageState, setActivityDraftImageState] = useState<ActivityDraftImageState>(
+    emptyActivityDraftImageState()
+  );
+  const [savedActivityImageState, setSavedActivityImageState] = useState<
+    Record<string, InstructionalImageState>
+  >({});
   const [lastInstructionalPreviewName, setLastInstructionalPreviewName] = useState("");
   const [childEditorOpen, setChildEditorOpen] = useState(false);
   const [activityEditorOpen, setActivityEditorOpen] = useState(false);
@@ -149,6 +171,7 @@ export default function App() {
   const [celebrationOverlay, setCelebrationOverlay] =
     useState<CelebrationOverlayState | null>(null);
   const pendingInstructionalBackfillKeys = useRef(new Set<string>());
+  const pendingDraftPreviewKeys = useRef(new Set<string>());
   const shouldBackfillInstructionalImages =
     import.meta.env.MODE !== "test" ||
     Boolean((window as Window & { __enableInstructionalBackfill__?: boolean }).__enableInstructionalBackfill__);
@@ -301,6 +324,34 @@ export default function App() {
     setChildEditorOpen(false);
   }
 
+  function syncActivityDraftImageState(draft: ActivityDraft): void {
+    setActivityDraftImageState({
+      activity: draft.imageUrl ? "ready" : "idle",
+      steps: Object.fromEntries(
+        draft.steps.map((step, index) => [index, step.imageUrl ? "ready" : "idle"])
+      )
+    });
+  }
+
+  function markSavedActivityImageState(
+    type: "routine" | "chore",
+    id: string,
+    status: InstructionalImageState
+  ): void {
+    setSavedActivityImageState((current) => ({
+      ...current,
+      [activityImageStatusKey(type, id)]: status
+    }));
+  }
+
+  function clearSavedActivityImageState(type: "routine" | "chore", id: string): void {
+    setSavedActivityImageState((current) => {
+      const next = { ...current };
+      delete next[activityImageStatusKey(type, id)];
+      return next;
+    });
+  }
+
   async function handleDeleteChildProfile(child: ChildProfile): Promise<void> {
     setError(null);
 
@@ -365,43 +416,11 @@ export default function App() {
     }
 
     try {
-      const resolvedActivityImageUrl =
+      const activityImageUrl =
         activityDraft.imageUrl.trim().length > 0 &&
         hasGeneratedInstructionalImage(activityDraft.imageUrl)
           ? activityDraft.imageUrl.trim()
-        : (
-            await generateInstructionalImage({
-              activityName: trimmedName,
-              stepLabels: activityDraft.steps.map((step) => step.label.trim()).filter(Boolean)
-            })
-          ).imageUrl;
-      const resolvedSteps = await Promise.all(
-        activityDraft.steps.map(async (step) => {
-          const label = step.label.trim();
-          if (!label) {
-            return null;
-          }
-
-          const imageUrl =
-            step.imageUrl.trim().length > 0 && hasGeneratedInstructionalImage(step.imageUrl)
-              ? step.imageUrl.trim()
-            : (
-                await generateInstructionalImage({
-                  activityName: label,
-                  stepLabels: [trimmedName]
-                })
-              ).imageUrl;
-
-          return {
-            label,
-            icon: step.icon.trim(),
-            imageUrl
-          };
-        })
-      );
-      const resolvedActivitySteps = resolvedSteps.filter(
-        (step): step is { label: string; icon: string; imageUrl: string } => step !== null
-      );
+          : undefined;
       const existingReward =
         activityDraft.editingActivityType === "routine"
           ? state.routines.find((entry) => entry.id === activityDraft.editingActivityId)?.reward
@@ -422,7 +441,10 @@ export default function App() {
         .map((step) => ({
           label: step.label.trim(),
           icon: "",
-          imageUrl: step.imageUrl.trim().length > 0 ? step.imageUrl.trim() : undefined
+          imageUrl:
+            step.imageUrl.trim().length > 0 && hasGeneratedInstructionalImage(step.imageUrl)
+              ? step.imageUrl.trim()
+              : undefined
         }))
         .filter((step) => step.label);
       const isStepBased = steps.length > 0;
@@ -449,11 +471,11 @@ export default function App() {
                 ? {}
                 : { childProfileId: selectedChildId }),
               name: trimmedName,
-              imageUrl: resolvedActivityImageUrl,
+              ...(activityImageUrl ? { imageUrl: activityImageUrl } : {}),
               schedule: {
                 days: activityDraft.selectedDays
               },
-              steps: resolvedActivitySteps,
+              steps,
               ...(reward ? { reward } : {})
             })
           }
@@ -465,6 +487,11 @@ export default function App() {
             ? current.routines.map((entry) => (entry.id === routine.id ? routine : entry))
             : [...current.routines, routine]
         }));
+        if (!routine.imageUrl || routine.steps.some((step) => !step.imageUrl)) {
+          markSavedActivityImageState("routine", routine.id, "pending");
+        } else {
+          clearSavedActivityImageState("routine", routine.id);
+        }
 
         setTodayPlan((current) => {
           const matchingDay = routine.schedule.days.includes(current.day);
@@ -493,7 +520,7 @@ export default function App() {
                 ? {}
                 : { childProfileId: selectedChildId }),
               name: trimmedName,
-              imageUrl: resolvedActivityImageUrl,
+              ...(activityImageUrl ? { imageUrl: activityImageUrl } : {}),
               recurrence: {
                 days: activityDraft.selectedDays
               },
@@ -509,6 +536,11 @@ export default function App() {
             ? current.chores.map((entry) => (entry.id === chore.id ? chore : entry))
             : [...current.chores, chore]
         }));
+        if (!chore.imageUrl) {
+          markSavedActivityImageState("chore", chore.id, "pending");
+        } else {
+          clearSavedActivityImageState("chore", chore.id);
+        }
 
         setTodayPlan((current) => {
           const matchingDay = chore.recurrence.days.includes(current.day);
@@ -521,6 +553,7 @@ export default function App() {
       }
 
       setActivityDraft(emptyActivityDraft());
+      setActivityDraftImageState(emptyActivityDraftImageState());
       setLastInstructionalPreviewName("");
       setActivityEditorOpen(false);
       setSavingMessage(activityDraft.editingActivityId ? "Activity updated" : "Activity saved");
@@ -540,7 +573,7 @@ export default function App() {
   }
 
   function handleEditRoutine(routine: Routine): void {
-    setActivityDraft({
+    const nextDraft: ActivityDraft = {
       editingActivityId: routine.id,
       editingActivityType: "routine",
       name: routine.name,
@@ -554,14 +587,16 @@ export default function App() {
         imageUrl: step.imageUrl ?? ""
       })),
       selectedDays: routine.schedule.days
-    });
+    };
+    setActivityDraft(nextDraft);
+    syncActivityDraftImageState(nextDraft);
     setActivityEditorOpen(true);
     setLastInstructionalPreviewName("");
     openSetupSection("activities");
   }
 
   function handleEditChore(chore: Chore): void {
-    setActivityDraft({
+    const nextDraft: ActivityDraft = {
       editingActivityId: chore.id,
       editingActivityType: "chore",
       name: chore.name,
@@ -571,7 +606,9 @@ export default function App() {
       rewardType: chore.reward?.type ?? "",
       steps: [],
       selectedDays: chore.recurrence.days
-    });
+    };
+    setActivityDraft(nextDraft);
+    syncActivityDraftImageState(nextDraft);
     setActivityEditorOpen(true);
     setLastInstructionalPreviewName("");
     openSetupSection("activities");
@@ -579,6 +616,7 @@ export default function App() {
 
   function startCreateActivity(): void {
     setActivityDraft(emptyActivityDraft());
+    setActivityDraftImageState(emptyActivityDraftImageState());
     setLastInstructionalPreviewName("");
     setActivityEditorOpen(true);
     openSetupSection("activities");
@@ -586,6 +624,7 @@ export default function App() {
 
   function cancelActivityEditor(): void {
     setActivityDraft(emptyActivityDraft());
+    setActivityDraftImageState(emptyActivityDraftImageState());
     setLastInstructionalPreviewName("");
     setActivityEditorOpen(false);
   }
@@ -646,6 +685,7 @@ export default function App() {
       setActivityDraft((current) =>
         current.editingActivityId === activity.id ? emptyActivityDraft() : current
       );
+      clearSavedActivityImageState(activity.type, activity.id);
       setActivityEditorOpen((current) =>
         activityDraft.editingActivityId === activity.id ? false : current
       );
@@ -667,7 +707,10 @@ export default function App() {
     }
 
     try {
-      setError(null);
+      setActivityDraftImageState((current) => ({
+        ...current,
+        activity: "pending"
+      }));
       setLastInstructionalPreviewName(trimmedName);
       const result = await generateInstructionalImage({
         activityName: trimmedName,
@@ -676,10 +719,17 @@ export default function App() {
 
       setActivityDraft((current) => ({
         ...current,
-        imageUrl: result.imageUrl
+        imageUrl: current.name.trim() === trimmedName ? result.imageUrl : current.imageUrl
+      }));
+      setActivityDraftImageState((current) => ({
+        ...current,
+        activity: "ready"
       }));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to generate instructional image");
+      setActivityDraftImageState((current) => ({
+        ...current,
+        activity: "unavailable"
+      }));
     }
   }
 
@@ -694,6 +744,13 @@ export default function App() {
           imageUrl: ""
         }
       ]
+    }));
+    setActivityDraftImageState((current) => ({
+      ...current,
+      steps: {
+        ...current.steps,
+        [activityDraft.steps.length]: "idle"
+      }
     }));
 
   }
@@ -712,8 +769,78 @@ export default function App() {
         imageUrl: ""
       };
     });
+    setActivityDraftImageState((current) => ({
+      activity: "idle",
+      steps: current.steps
+    }));
     setLastInstructionalPreviewName("");
   }
+
+  useEffect(() => {
+    if (!activityEditorOpen || !selectedChildId) {
+      return;
+    }
+
+    const activityName = activityDraft.name.trim() || "routine step";
+
+    activityDraft.steps.forEach((step, index) => {
+      const stepLabel = step.label.trim();
+      if (!stepLabel || hasGeneratedInstructionalImage(step.imageUrl)) {
+        return;
+      }
+
+      const pendingKey = `${index}:${activityName}:${stepLabel}`;
+      if (pendingDraftPreviewKeys.current.has(pendingKey)) {
+        return;
+      }
+
+      pendingDraftPreviewKeys.current.add(pendingKey);
+      setActivityDraftImageState((current) => ({
+        ...current,
+        steps: {
+          ...current.steps,
+          [index]: "pending"
+        }
+      }));
+
+      void generateInstructionalImage({
+        activityName: stepLabel,
+        stepLabels: [activityName]
+      })
+        .then((result) => {
+          setActivityDraft((current) => ({
+            ...current,
+            steps: current.steps.map((currentStep, currentIndex) =>
+              currentIndex === index && currentStep.label.trim() === stepLabel
+                ? {
+                    ...currentStep,
+                    imageUrl: result.imageUrl
+                  }
+                : currentStep
+            )
+          }));
+          setActivityDraftImageState((current) => ({
+            ...current,
+            steps: {
+              ...current.steps,
+              [index]: "ready"
+            }
+          }));
+        })
+        .catch(() => {
+          setActivityDraftImageState((current) => ({
+            ...current,
+            steps: {
+              ...current.steps,
+              [index]: "unavailable"
+            }
+          }));
+        })
+        .finally(() => {
+          pendingDraftPreviewKeys.current.delete(pendingKey);
+        });
+    });
+  }, [activityDraft.name, activityDraft.steps, activityEditorOpen, selectedChildId]);
 
   const weeklyMatrixRows = selectedChildId
     ? buildWeeklyMatrixRows({
@@ -735,14 +862,27 @@ export default function App() {
 
     async function backfillMissingInstructionalImages(): Promise<void> {
       try {
-      const routinesNeedingImages = state.routines.filter(
-        (routine) =>
-          !hasGeneratedInstructionalImage(routine.imageUrl) ||
-          routine.steps.some((step) => !hasGeneratedInstructionalImage(step.imageUrl))
-      );
-      const choresNeedingImages = state.chores.filter(
-        (chore) => !hasGeneratedInstructionalImage(chore.imageUrl)
-      );
+        const routinesNeedingImages = state.routines.filter(
+          (routine) =>
+            !hasGeneratedInstructionalImage(routine.imageUrl) ||
+            routine.steps.some((step) => !hasGeneratedInstructionalImage(step.imageUrl))
+        );
+        const choresNeedingImages = state.chores.filter(
+          (chore) => !hasGeneratedInstructionalImage(chore.imageUrl)
+        );
+
+        if (routinesNeedingImages.length > 0 || choresNeedingImages.length > 0) {
+          setSavedActivityImageState((current) => {
+            const next = { ...current };
+            for (const routine of routinesNeedingImages) {
+              next[activityImageStatusKey("routine", routine.id)] = "pending";
+            }
+            for (const chore of choresNeedingImages) {
+              next[activityImageStatusKey("chore", chore.id)] = "pending";
+            }
+            return next;
+          });
+        }
 
         if (routinesNeedingImages.length === 0 && choresNeedingImages.length === 0) {
           return;
@@ -921,7 +1061,33 @@ export default function App() {
             };
           })
         }));
+        setSavedActivityImageState((current) => {
+          const next = { ...current };
+          for (const routineId of routineImageMap.keys()) {
+            delete next[activityImageStatusKey("routine", routineId)];
+          }
+          for (const choreId of choreImageMap.keys()) {
+            delete next[activityImageStatusKey("chore", choreId)];
+          }
+          return next;
+        });
       } catch (err) {
+        setSavedActivityImageState((current) => {
+          const next = { ...current };
+          for (const routine of state.routines.filter(
+            (entry) =>
+              !hasGeneratedInstructionalImage(entry.imageUrl) ||
+              entry.steps.some((step) => !hasGeneratedInstructionalImage(step.imageUrl))
+          )) {
+            next[activityImageStatusKey("routine", routine.id)] = "unavailable";
+          }
+          for (const chore of state.chores.filter(
+            (entry) => !hasGeneratedInstructionalImage(entry.imageUrl)
+          )) {
+            next[activityImageStatusKey("chore", chore.id)] = "unavailable";
+          }
+          return next;
+        });
         if (!cancelled) {
           setError(err instanceof Error ? err.message : "Unable to backfill instructional images");
         }
@@ -1096,8 +1262,12 @@ export default function App() {
 
   return (
     <main className="app-shell">
-      {error ? <p className="feedback error">{error}</p> : null}
-      {savingMessage ? <p className="feedback success">{savingMessage}</p> : null}
+      {error || savingMessage ? (
+        <div className="feedback-stack" aria-live="polite" aria-atomic="true">
+          {error ? <p className="feedback error">{error}</p> : null}
+          {savingMessage ? <p className="feedback success">{savingMessage}</p> : null}
+        </div>
+      ) : null}
 
       <nav className="mode-switch panel" aria-label="Top-level navigation">
         <button type="button" aria-pressed={activeRoute === "matrix"} onClick={() => navigateTo("matrix")}>
@@ -1118,6 +1288,8 @@ export default function App() {
           activityEditorOpen={activityEditorOpen}
           childDraft={childDraft}
           activityDraft={activityDraft}
+          activityImageState={activityDraftImageState}
+          savedActivityImageState={savedActivityImageState}
           childProfiles={state.childProfiles}
           selectedChildId={selectedChildId}
           routines={state.routines}
@@ -1140,23 +1312,46 @@ export default function App() {
           onActivityNameBlur={(value) => void handleGenerateInstructionalImage(value)}
           onAddActivityStep={handleAddActivityStep}
           onRemoveActivityStep={(stepIndex) =>
-            setActivityDraft((current) => ({
-              ...current,
-              steps: current.steps.filter((_, index) => index !== stepIndex)
-            }))
+            {
+              setActivityDraft((current) => ({
+                ...current,
+                steps: current.steps.filter((_, index) => index !== stepIndex)
+              }));
+              setActivityDraftImageState((current) => ({
+                ...current,
+                steps: Object.fromEntries(
+                  Object.entries(current.steps)
+                    .filter(([key]) => Number(key) !== stepIndex)
+                    .map(([key, value]) => [
+                      Number(key) > stepIndex ? Number(key) - 1 : Number(key),
+                      value
+                    ])
+                )
+              }));
+            }
           }
           onUpdateActivityStepLabel={(stepIndex, value) =>
-            setActivityDraft((current) => ({
-              ...current,
-              steps: current.steps.map((step, index) =>
-                index === stepIndex
-                  ? {
-                      ...step,
-                      label: value
-                    }
-                  : step
-              )
-            }))
+            {
+              setActivityDraft((current) => ({
+                ...current,
+                steps: current.steps.map((step, index) =>
+                  index === stepIndex
+                    ? {
+                        ...step,
+                        label: value,
+                        imageUrl: ""
+                      }
+                    : step
+                )
+              }));
+              setActivityDraftImageState((current) => ({
+                ...current,
+                steps: {
+                  ...current.steps,
+                  [stepIndex]: value.trim() ? "pending" : "idle"
+                }
+              }));
+            }
           }
           onToggleActivityDay={(day) =>
             setActivityDraft((current) => ({

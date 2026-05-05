@@ -1,12 +1,12 @@
-import { useEffect, type CSSProperties, type FormEvent } from "react";
+import type { CSSProperties, FormEvent } from "react";
 
 import { weekDays } from "../app/constants";
-import { generateInstructionalImage } from "../app/completion-imagery";
 import type {
   ActivityDraft,
   ChildProfile,
   ChildProfileDraft,
   Chore,
+  InstructionalImageState,
   Routine,
   SetupSection,
   Weekday
@@ -18,6 +18,11 @@ type SetupWorkspaceProps = {
   activityEditorOpen: boolean;
   childDraft: ChildProfileDraft;
   activityDraft: ActivityDraft;
+  activityImageState: {
+    activity: InstructionalImageState;
+    steps: Record<number, InstructionalImageState>;
+  };
+  savedActivityImageState: Record<string, InstructionalImageState>;
   childProfiles: ChildProfile[];
   selectedChildId: string;
   routines: Routine[];
@@ -50,6 +55,8 @@ export function SetupWorkspace({
   activityEditorOpen,
   childDraft,
   activityDraft,
+  activityImageState,
+  savedActivityImageState,
   childProfiles,
   selectedChildId,
   routines,
@@ -77,58 +84,6 @@ export function SetupWorkspace({
 }: SetupWorkspaceProps) {
   const selectedChild =
     childProfiles.find((child) => child.id === selectedChildId) ?? null;
-  const activityStepSignature = activityDraft.steps.map((step) => step.label.trim()).join("|");
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function regenerateStepImages(): Promise<void> {
-      const activityName = activityDraft.name.trim() || "routine step";
-      const generatedImages = await Promise.all(
-        activityDraft.steps.map(async (step, index) => {
-          const stepLabel = step.label.trim();
-          if (!stepLabel) {
-            return null;
-          }
-
-          const result = await generateInstructionalImage({
-            activityName: stepLabel,
-            stepLabels: [activityName]
-          });
-          return { index, imageUrl: result.imageUrl };
-        })
-      );
-
-      if (cancelled) {
-        return;
-      }
-
-      onActivityDraftChange((current) => ({
-        ...current,
-        steps: current.steps.map((step, index) => {
-          const generated = generatedImages[index];
-          if (!generated?.imageUrl) {
-            return step;
-          }
-
-          return {
-            ...step,
-            imageUrl: generated.imageUrl
-          };
-        })
-      }));
-    }
-
-    if (!activityEditorOpen || activityDraft.steps.length === 0) {
-      return;
-    }
-
-    void regenerateStepImages();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [activityDraft.name, activityStepSignature, activityEditorOpen, onActivityDraftChange]);
 
   const childActivities = [
     ...routines
@@ -152,6 +107,10 @@ export function SetupWorkspace({
         chore
       }))
   ];
+
+  function savedActivityKey(type: "routine" | "chore", id: string): string {
+    return `${type}:${id}`;
+  }
 
   return (
     <section className="setup-shell">
@@ -338,6 +297,14 @@ export function SetupWorkspace({
                 <div className="completion-art">
                   <img src={activityDraft.imageUrl} alt="Instructional image preview" />
                 </div>
+              ) : activityImageState.activity === "pending" ? (
+                <div className="completion-art completion-art-placeholder" aria-label="Generating image">
+                  <span>Generating image...</span>
+                </div>
+              ) : activityImageState.activity === "unavailable" ? (
+                <div className="completion-art completion-art-unavailable" aria-label="Image unavailable">
+                  <span>Image unavailable</span>
+                </div>
               ) : null}
 
               <div className="stack-form">
@@ -378,8 +345,16 @@ export function SetupWorkspace({
                             src={step.imageUrl}
                             alt={`Picture for step ${index + 1}`}
                           />
+                        ) : activityImageState.steps[index] === "unavailable" ? (
+                          <div className="step-preview step-preview-loading" aria-label="Image unavailable">
+                            <span>Image unavailable</span>
+                          </div>
                         ) : (
-                          <div className="step-preview step-preview-loading" aria-hidden="true">
+                          <div
+                            className="step-preview step-preview-loading"
+                            aria-label={activityImageState.steps[index] === "pending" ? "Generating image" : undefined}
+                            aria-hidden={activityImageState.steps[index] === "pending" ? undefined : "true"}
+                          >
                             <span>Generating image...</span>
                           </div>
                         )}
@@ -478,6 +453,14 @@ export function SetupWorkspace({
                         src={activity.routine?.imageUrl ?? activity.chore?.imageUrl}
                         alt={`Picture for ${activity.name}`}
                       />
+                    ) : savedActivityImageState[savedActivityKey(activity.type, activity.id)] === "pending" ? (
+                      <div className="entity-card-image step-preview-loading">
+                        <span>Generating image...</span>
+                      </div>
+                    ) : savedActivityImageState[savedActivityKey(activity.type, activity.id)] === "unavailable" ? (
+                      <div className="entity-card-image step-preview-loading">
+                        <span>Image unavailable</span>
+                      </div>
                     ) : null}
                     <div>
                       <div className="entity-heading">

@@ -39,6 +39,18 @@ The single activity creation flow SHALL support the core parent/admin inputs nee
 - **THEN** the system does not show a separate reward type or reward amount control in the default form
 - **THEN** the completion sticker experience remains automatic and separate from activity authoring
 
+#### Scenario: Parent saves while instructional imagery is still pending
+- **WHEN** a parent/admin user saves a valid activity before the generated instructional image or step thumbnails are ready
+- **THEN** the system saves the activity immediately
+- **THEN** the interface continues to show a generating-image state until the saved activity imagery is later available
+- **THEN** save and error feedback remain visibly on screen even when the parent has scrolled down in the workspace
+
+#### Scenario: Saved activity artwork appears later on the Sticker Chart
+- **WHEN** a parent/admin user saves a valid activity before its generated instructional artwork has finished
+- **THEN** the activity still appears immediately in the saved household data
+- **THEN** background image generation continues after the save completes
+- **THEN** once the generated artwork is persisted, the Sticker Chart shows the new activity image without requiring the parent to recreate the activity
+
 ### Requirement: Activities SHALL support an instructional task image
 The system SHALL allow an activity to have a stable instructional image that communicates what the person is supposed to do.
 
@@ -113,9 +125,9 @@ The system SHALL let a parent admin list, create, update, and delete activities 
 - **WHEN** the system loads an existing routine or chore that does not yet have generated artwork
 - **THEN** the system generates the missing image assets
 - **THEN** the generated artwork is written back to the saved activity record so it is available on future loads
+- **THEN** the visible activity-management workspace remains usable while the generation work is still pending
 
 #### Scenario: Parent starts creating a single-action activity
 - **WHEN** the parent creates an activity without subtasks
 - **THEN** the system keeps the form focused on the single-action path
 - **THEN** the system does not force the parent to process step-management inputs that add no value for that case
-
