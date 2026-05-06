@@ -2,6 +2,7 @@ import type { Express } from "express";
 
 import { isWeekday } from "../domain/weekdays.js";
 import { ensureRole } from "../lib/auth.js";
+import { serializeChore, serializeCompletion, serializeRoutine } from "../lib/image-assets.js";
 import type { ParticipationStore } from "../lib/store.js";
 import { sendValidationError } from "../lib/validation.js";
 
@@ -39,17 +40,17 @@ export function registerTodayPlanRoutes(app: Express, store: ParticipationStore)
         (routine) =>
           routine.childProfileId === childProfileId &&
           routine.schedule.days.includes(day)
-      ),
+      ).map(serializeRoutine),
       chores: state.chores.filter(
         (chore) =>
           chore.childProfileId === childProfileId &&
           chore.recurrence.days.includes(day)
-      ),
+      ).map(serializeChore),
       pendingApprovals: state.completions.filter(
         (completion) =>
           completion.childProfileId === childProfileId &&
           completion.status === "pendingApproval"
-      )
+      ).map(serializeCompletion)
     });
   });
 }

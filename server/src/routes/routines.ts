@@ -4,6 +4,7 @@ import type { Express } from "express";
 
 import type { Routine, RoutineStep } from "../domain/types.js";
 import { ensureRole } from "../lib/auth.js";
+import { serializeRoutine } from "../lib/image-assets.js";
 import { deleteRoutineAndRelatedState } from "../lib/state-cleanup.js";
 import type { ParticipationStore } from "../lib/store.js";
 import { isRewardDefinition, sendValidationError, validateDays } from "../lib/validation.js";
@@ -102,7 +103,7 @@ export function registerRoutineRoutes(app: Express, store: ParticipationStore): 
 
     state.routines.push(routine);
     await store.write(state);
-    res.status(201).json(routine);
+    res.status(201).json(serializeRoutine(routine));
   });
 
   app.get("/api/routines", async (req, res) => {
@@ -111,7 +112,7 @@ export function registerRoutineRoutes(app: Express, store: ParticipationStore): 
     }
 
     const state = await store.read();
-    res.json(state.routines);
+    res.json(state.routines.map(serializeRoutine));
   });
 
   app.patch("/api/routines/:routineId", async (req, res) => {
@@ -159,7 +160,7 @@ export function registerRoutineRoutes(app: Express, store: ParticipationStore): 
     routine.updatedAt = new Date().toISOString();
 
     await store.write(state);
-    res.json(routine);
+    res.json(serializeRoutine(routine));
   });
 
   app.delete("/api/routines/:routineId", async (req, res) => {

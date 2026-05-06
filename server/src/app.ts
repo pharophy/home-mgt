@@ -7,7 +7,10 @@ import express, { type Express } from "express";
 import type { CreateAppOptions } from "./domain/types.js";
 import { createCompletionImageService } from "./lib/completion-images.js";
 import { createInstructionalImageService } from "./lib/instructional-images.js";
+import { managedGeneratedAssetMountPath, resolveManagedGeneratedAssetDir } from "./lib/image-assets.js";
+import { ManagedGeneratedImageStore } from "./lib/managed-generated-images.js";
 import { createParticipationStore } from "./lib/sql-store.js";
+import { registerImageAssetRoutes } from "./routes/image-assets.js";
 import { registerChildProfileRoutes } from "./routes/child-profiles.js";
 import { registerChoreRoutes } from "./routes/chores.js";
 import { registerCompletionImageRoutes } from "./routes/completion-images.js";
@@ -20,14 +23,19 @@ import { registerTodayPlanRoutes } from "./routes/today-plan.js";
 
 export function createApp(options: CreateAppOptions = {}): Express {
   const dataFile = options.dataFile ?? path.join(process.cwd(), "server-data.json");
+  const generatedAssetDir =
+    options.generatedAssetDir ?? resolveManagedGeneratedAssetDir(process.cwd());
   const store =
     options.store ??
-    createParticipationStore({
-      dataFile,
-      sqlConnectionString:
-        options.sqlConnectionString ?? process.env.PRESCHOOL_SQL_CONNECTION_STRING,
-      sqlClient: options.sqlClient
-    });
+    new ManagedGeneratedImageStore(
+      createParticipationStore({
+        dataFile,
+        sqlConnectionString:
+          options.sqlConnectionString ?? process.env.PRESCHOOL_SQL_CONNECTION_STRING,
+        sqlClient: options.sqlClient
+      }),
+      generatedAssetDir
+    );
   const completionImageService =
     options.completionImageService ?? createCompletionImageService(process.env.OPENAI_API_KEY);
   const instructionalImageService =
@@ -41,6 +49,7 @@ export function createApp(options: CreateAppOptions = {}): Express {
 
   app.use(cors());
   app.use(express.json({ limit: "10mb" }));
+  app.use(managedGeneratedAssetMountPath, express.static(generatedAssetDir));
 
   if (clientDistDir) {
     app.use(express.static(clientDistDir));
@@ -61,6 +70,7 @@ export function createApp(options: CreateAppOptions = {}): Express {
     });
   });
 
+  registerImageAssetRoutes(app, store);
   registerChildProfileRoutes(app, store);
   registerRoutineRoutes(app, store);
   registerChoreRoutes(app, store);

@@ -104,7 +104,13 @@ function completionArtworkKey(childProfileId: string, day: string | undefined, i
 }
 
 function hasGeneratedInstructionalImage(imageUrl: string | null | undefined): boolean {
-  return typeof imageUrl === "string" && imageUrl.startsWith("data:image/png;base64,");
+  return (
+    typeof imageUrl === "string" &&
+    (imageUrl.startsWith("data:image/") ||
+      imageUrl.startsWith("/generated-assets/") ||
+      imageUrl.startsWith("/api/routines/") ||
+      imageUrl.startsWith("/api/chores/"))
+  );
 }
 
 function readRouteFromHash(): AppRoute {

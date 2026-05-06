@@ -27,6 +27,7 @@ export interface CreateAppOptions {
   store?: ParticipationStore;
   sqlConnectionString?: string;
   sqlClient?: SqlParticipationClient;
+  generatedAssetDir?: string;
   clientDistDir?: string;
   completionImageService?: CompletionImageService;
   instructionalImageService?: InstructionalImageService;

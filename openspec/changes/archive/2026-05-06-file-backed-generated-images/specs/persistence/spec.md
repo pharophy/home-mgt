@@ -1,8 +1,5 @@
-# persistence Specification
+## MODIFIED Requirements
 
-## Purpose
-Define the SQL-backed persistence model and initialization behavior for preschool participation data.
-## Requirements
 ### Requirement: The participation data model SHALL persist to SQL
 The system SHALL persist the preschool participation data model in SQL tables rather than a local JSON snapshot file, and generated activity or completion image fields SHALL persist managed same-origin asset references rather than inline generated-image payloads.
 
@@ -27,4 +24,3 @@ The system SHALL ensure the required SQL tables for the preschool participation 
 - **WHEN** the server starts with a valid SQL connection string pointing at an empty database
 - **THEN** it initializes the required MVP tables idempotently
 - **THEN** normal read and write routes can operate without requiring a manually pre-created schema
-

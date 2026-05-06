@@ -11,3 +11,5 @@ coverage/
 tmp-codex/
 playwright-report/
 test-results/
+.tmp-dev-logs/
+generated-assets/

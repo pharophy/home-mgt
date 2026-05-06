@@ -4,6 +4,7 @@ import type { Express } from "express";
 
 import type { Chore } from "../domain/types.js";
 import { ensureRole } from "../lib/auth.js";
+import { serializeChore } from "../lib/image-assets.js";
 import { deleteChoreAndRelatedState } from "../lib/state-cleanup.js";
 import type { ParticipationStore } from "../lib/store.js";
 import { isRewardDefinition, sendValidationError, validateDays } from "../lib/validation.js";
@@ -59,7 +60,7 @@ export function registerChoreRoutes(app: Express, store: ParticipationStore): vo
 
     state.chores.push(chore);
     await store.write(state);
-    res.status(201).json(chore);
+    res.status(201).json(serializeChore(chore));
   });
 
   app.get("/api/chores", async (req, res) => {
@@ -68,7 +69,7 @@ export function registerChoreRoutes(app: Express, store: ParticipationStore): vo
     }
 
     const state = await store.read();
-    res.json(state.chores);
+    res.json(state.chores.map(serializeChore));
   });
 
   app.patch("/api/chores/:choreId", async (req, res) => {
@@ -110,7 +111,7 @@ export function registerChoreRoutes(app: Express, store: ParticipationStore): vo
     chore.updatedAt = new Date().toISOString();
 
     await store.write(state);
-    res.json(chore);
+    res.json(serializeChore(chore));
   });
 
   app.delete("/api/chores/:choreId", async (req, res) => {

@@ -67,7 +67,10 @@ export function registerCompletionImageRoutes(
       completion.celebrationTheme = result.selectedTheme;
       completion.celebrationGeneratedAt = new Date().toISOString();
       await store.write(state);
-      res.json(result);
+      res.json({
+        ...result,
+        imageUrl: completion.celebrationImageUrl
+      });
     } catch {
       res.status(503).json({ error: "Completion image unavailable" });
     }

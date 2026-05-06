@@ -1,6 +1,7 @@
 import type { Express } from "express";
 
 import { ensureRole } from "../lib/auth.js";
+import { serializeChore, serializeCompletion, serializeRoutine } from "../lib/image-assets.js";
 import type { ParticipationStore } from "../lib/store.js";
 
 export function registerStateRoutes(app: Express, store: ParticipationStore): void {
@@ -15,13 +16,13 @@ export function registerStateRoutes(app: Express, store: ParticipationStore): vo
       householdRoles: state.householdRoles,
       householdSettings: state.householdSettings,
       childProfiles: state.childProfiles,
-      routines: state.routines,
-      chores: state.chores,
-      completions: state.completions,
+      routines: state.routines.map(serializeRoutine),
+      chores: state.chores.map(serializeChore),
+      completions: state.completions.map(serializeCompletion),
       rewards: state.rewards,
       pendingApprovals: state.completions.filter(
         (completion) => completion.status === "pendingApproval"
-      )
+      ).map(serializeCompletion)
     });
   });
 }

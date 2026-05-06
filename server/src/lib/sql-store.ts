@@ -9,7 +9,7 @@ import type {
   Routine,
   RoutineStep
 } from "../domain/types.js";
-import { JsonParticipationStore, type ParticipationStore } from "./store.js";
+import type { ParticipationStore } from "./store.js";
 
 type SqlHouseholdSettingsRow = {
   celebration_mode: "full" | "gentle";
@@ -125,6 +125,29 @@ function parseConnectionString(connectionString: string): Record<string, string>
         ];
       })
   );
+}
+
+function isTruthyConnectionOption(value: string | undefined): boolean {
+  const normalized = (value ?? "").toLowerCase();
+  return normalized === "yes" || normalized === "true";
+}
+
+export function buildMssqlConnectionConfig(connectionString: string): {
+  connectionString: string;
+  options: {
+    trustedConnection: boolean;
+    trustServerCertificate: boolean;
+  };
+} {
+  const parsed = parseConnectionString(connectionString);
+
+  return {
+    connectionString,
+    options: {
+      trustedConnection: isTruthyConnectionOption(parsed.trusted_connection),
+      trustServerCertificate: isTruthyConnectionOption(parsed.trustservercertificate)
+    }
+  };
 }
 
 function parseStringArray(value: string): string[] {
@@ -347,23 +370,9 @@ export class MssqlParticipationClient implements SqlParticipationClient {
 
   private async getPool(): Promise<any> {
     if (!this.poolPromise) {
-      const parsed = parseConnectionString(this.connectionString);
-      const config = {
-        server: parsed.server ?? "localhost",
-        database: parsed.database,
-        user: parsed["user id"] ?? parsed.uid,
-        password: parsed.password ?? parsed.pwd,
-        driver: parsed.driver?.replace(/^\{|\}$/g, ""),
-        options: {
-          trustedConnection:
-            (parsed.trusted_connection ?? "").toLowerCase() === "yes" ||
-            (parsed.trusted_connection ?? "").toLowerCase() === "true",
-          trustServerCertificate:
-            (parsed.trustservercertificate ?? "").toLowerCase() === "yes" ||
-            (parsed.trustservercertificate ?? "").toLowerCase() === "true"
-        }
-      };
-      this.poolPromise = new sql.ConnectionPool(config).connect();
+      this.poolPromise = new sql.ConnectionPool(
+        buildMssqlConnectionConfig(this.connectionString)
+      ).connect();
     }
 
     return this.poolPromise;
@@ -641,7 +650,6 @@ export class MssqlParticipationClient implements SqlParticipationClient {
 }
 
 export function createParticipationStore({
-  dataFile,
   sqlConnectionString,
   sqlClient
 }: {
@@ -657,5 +665,7 @@ export function createParticipationStore({
     return new SqlParticipationStore(new MssqlParticipationClient(sqlConnectionString));
   }
 
-  return new JsonParticipationStore(dataFile);
+  throw new Error(
+    "PRESCHOOL_SQL_CONNECTION_STRING is required for SQL-backed persistence."
+  );
 }

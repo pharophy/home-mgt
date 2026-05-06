@@ -4,6 +4,7 @@ import test from "node:test";
 import { createDefaultState } from "../domain/state.js";
 import type { PreschoolParticipationState } from "../domain/types.js";
 import {
+  buildMssqlConnectionConfig,
   SqlParticipationStore,
   createParticipationStore,
   type SqlParticipationClient,
@@ -148,4 +149,27 @@ test("createParticipationStore prefers the sql store when a connection string is
   });
 
   assert.equal(store.constructor.name, "SqlParticipationStore");
+});
+
+test("buildMssqlConnectionConfig preserves the raw connection string for named SQL instances", () => {
+  const connectionString =
+    "Driver={ODBC Driver 17 for SQL Server};Server=.\\SQLExpress;Database=HomeMgt;Trusted_Connection=Yes;TrustServerCertificate=Yes;";
+
+  assert.deepEqual(buildMssqlConnectionConfig(connectionString), {
+    connectionString,
+    options: {
+      trustedConnection: true,
+      trustServerCertificate: true
+    }
+  });
+});
+
+test("createParticipationStore requires sql configuration when no explicit test seam is provided", () => {
+  assert.throws(
+    () =>
+      createParticipationStore({
+        dataFile: "ignored.json"
+      }),
+    /PRESCHOOL_SQL_CONNECTION_STRING/
+  );
 });

@@ -1,17 +1,27 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, test } from "node:test";
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import type { AddressInfo } from "node:net";
 
 import { createApp } from "./app.js";
+import { managedGeneratedAssetMountPath } from "./lib/image-assets.js";
+import { ManagedGeneratedImageStore } from "./lib/managed-generated-images.js";
+import { JsonParticipationStore } from "./lib/store.js";
 
 let tempDir = "";
 let baseUrl = "";
 let dataFile = "";
+let generatedAssetDir = "";
 let closeServer: (() => Promise<void>) | null = null;
-let appOptions: Parameters<typeof createApp>[0] = {};
+let appOptions: NonNullable<Parameters<typeof createApp>[0]> = {};
+const smallPngDataUrl = "data:image/png;base64,QUJD";
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
 async function requestJson(
   input: string,
@@ -25,7 +35,16 @@ async function requestJson(
 }
 
 async function startServer(): Promise<void> {
-  const app = createApp({ dataFile, ...appOptions });
+  const app = createApp({
+    dataFile,
+    generatedAssetDir,
+    store:
+      appOptions.store ??
+      (appOptions.sqlClient || appOptions.sqlConnectionString
+        ? undefined
+        : new ManagedGeneratedImageStore(new JsonParticipationStore(dataFile), generatedAssetDir)),
+    ...appOptions
+  });
   const server = app.listen(0);
   const address = server.address() as AddressInfo;
   baseUrl = `http://127.0.0.1:${address.port}`;
@@ -46,6 +65,7 @@ async function startServer(): Promise<void> {
 beforeEach(async () => {
   tempDir = await mkdtemp(path.join(os.tmpdir(), "home-mgt-"));
   dataFile = path.join(tempDir, "home.json");
+  generatedAssetDir = path.join(tempDir, "generated-assets");
   appOptions = {};
   await startServer();
 });
@@ -224,8 +244,16 @@ test("parent can save a routine with a large instructional image payload", async
 
   assert.equal(routineResponse.status, 201);
   const routine = routineResponse.json as { imageUrl: string; steps: Array<{ imageUrl?: string }> };
-  assert.equal(routine.imageUrl, largeImageUrl);
-  assert.equal(routine.steps[0]?.imageUrl, largeImageUrl);
+  assert.match(
+    routine.imageUrl,
+    new RegExp(`^${escapeRegExp(managedGeneratedAssetMountPath)}/routines/[^/]+\\.[a-z0-9]+$`)
+  );
+  assert.match(
+    routine.steps[0]?.imageUrl ?? "",
+    new RegExp(
+      `^${escapeRegExp(managedGeneratedAssetMountPath)}/routines/[^/]+/steps/[^/]+\\.[a-z0-9]+$`
+    )
+  );
 });
 
 test("parent can request an instructional image for an activity", async () => {
@@ -606,6 +634,144 @@ test("today plan resolves recurring routines and chores for the requested day", 
   );
 });
 
+test("state and today-plan serialize persisted generated images as asset urls", async () => {
+  const childProfileResponse = await requestJson("/api/child-profiles", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-actor-role": "parentAdmin",
+      "x-actor-id": "parent-1"
+    },
+    body: JSON.stringify({
+      name: "Milo",
+      color: "#F472B6"
+    })
+  });
+  const childProfile = childProfileResponse.json as { id: string };
+
+  const routineResponse = await requestJson("/api/routines", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-actor-role": "parentAdmin",
+      "x-actor-id": "parent-1"
+    },
+    body: JSON.stringify({
+      childProfileId: childProfile.id,
+      name: "Morning routine",
+      imageUrl: smallPngDataUrl,
+      schedule: {
+        days: ["wednesday"]
+      },
+      steps: [
+        {
+          label: "Brush teeth",
+          imageUrl: smallPngDataUrl
+        }
+      ]
+    })
+  });
+  const routine = routineResponse.json as { id: string; steps: Array<{ id: string }> };
+
+  const choreResponse = await requestJson("/api/chores", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-actor-role": "parentAdmin",
+      "x-actor-id": "parent-1"
+    },
+    body: JSON.stringify({
+      childProfileId: childProfile.id,
+      name: "Put cup in sink",
+      imageUrl: smallPngDataUrl,
+      recurrence: {
+        days: ["wednesday"]
+      },
+      requiresApproval: false
+    })
+  });
+  const chore = choreResponse.json as { id: string };
+
+  const completionResponse = await requestJson("/api/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-actor-role": "parentAdmin",
+      "x-actor-id": "parent-1"
+    },
+    body: JSON.stringify({
+      itemType: "chore",
+      itemId: chore.id,
+      childProfileId: childProfile.id,
+      scheduledDay: "wednesday"
+    })
+  });
+  const completion = completionResponse.json as { id: string };
+
+  const rawStateResponse = await fetch(`${baseUrl}/api/state`, {
+    headers: {
+      "x-actor-role": "parentAdmin",
+      "x-actor-id": "parent-1"
+    }
+  });
+  assert.equal(rawStateResponse.status, 200);
+  const rawStateText = await rawStateResponse.text();
+  assert.equal(rawStateText.includes("data:image/"), false);
+
+  const state = JSON.parse(rawStateText) as {
+    routines: Array<{ id: string; imageUrl?: string; steps: Array<{ id: string; imageUrl?: string }> }>;
+    chores: Array<{ id: string; imageUrl?: string }>;
+    completions: Array<{ id: string; celebrationImageUrl?: string }>;
+  };
+  assert.match(
+    state.routines.find((entry) => entry.id === routine.id)?.imageUrl ?? "",
+    new RegExp(`^${escapeRegExp(managedGeneratedAssetMountPath)}/routines/${routine.id}\\.[a-z0-9]+$`)
+  );
+  assert.match(
+    state.routines.find((entry) => entry.id === routine.id)?.steps[0]?.imageUrl ?? "",
+    new RegExp(
+      `^${escapeRegExp(managedGeneratedAssetMountPath)}/routines/${routine.id}/steps/${routine.steps[0]?.id}\\.[a-z0-9]+$`
+    )
+  );
+  assert.match(
+    state.chores.find((entry) => entry.id === chore.id)?.imageUrl ?? "",
+    new RegExp(`^${escapeRegExp(managedGeneratedAssetMountPath)}/chores/${chore.id}\\.[a-z0-9]+$`)
+  );
+  assert.equal(
+    state.completions.find((entry) => entry.id === completion.id)?.celebrationImageUrl,
+    undefined
+  );
+
+  const todayPlanResponse = await requestJson(
+    `/api/today-plan?childProfileId=${childProfile.id}&day=wednesday`,
+    {
+      headers: {
+        "x-actor-role": "parentAdmin",
+        "x-actor-id": "parent-1"
+      }
+    }
+  );
+  assert.equal(todayPlanResponse.status, 200);
+  const todayPlan = todayPlanResponse.json as {
+    routines: Array<{ imageUrl?: string; steps: Array<{ imageUrl?: string }> }>;
+    chores: Array<{ imageUrl?: string }>;
+  };
+  assert.match(
+    todayPlan.routines[0]?.imageUrl ?? "",
+    new RegExp(`^${escapeRegExp(managedGeneratedAssetMountPath)}/routines/${routine.id}\\.[a-z0-9]+$`)
+  );
+  assert.match(
+    todayPlan.routines[0]?.steps[0]?.imageUrl ?? "",
+    new RegExp(
+      `^${escapeRegExp(managedGeneratedAssetMountPath)}/routines/${routine.id}/steps/${routine.steps[0]?.id}\\.[a-z0-9]+$`
+    )
+  );
+  assert.match(
+    todayPlan.chores[0]?.imageUrl ?? "",
+    new RegExp(`^${escapeRegExp(managedGeneratedAssetMountPath)}/chores/${chore.id}\\.[a-z0-9]+$`)
+  );
+});
+
 test("legacy persisted state is migrated to the current preschool schema", async () => {
   if (closeServer) {
     await closeServer();
@@ -657,6 +823,119 @@ test("legacy persisted state is migrated to the current preschool schema", async
   });
   assert.deepEqual(state.rewards, []);
   assert.deepEqual(state.completions, []);
+});
+
+test("legacy inline generated images are migrated to managed asset files", async () => {
+  if (closeServer) {
+    await closeServer();
+  }
+
+  await writeFile(
+    dataFile,
+    JSON.stringify(
+      {
+        schemaVersion: 1,
+        householdRoles: {
+          parentAdmins: []
+        },
+        householdSettings: {
+          celebrationMode: "full"
+        },
+        childProfiles: [],
+        routines: [
+          {
+            id: "routine-1",
+            childProfileId: "child-1",
+            name: "Morning helper",
+            imageUrl: smallPngDataUrl,
+            schedule: {
+              days: ["monday"]
+            },
+            steps: [
+              {
+                id: "step-1",
+                label: "Brush teeth",
+                order: 0,
+                imageUrl: smallPngDataUrl
+              }
+            ],
+            createdAt: "2026-01-01T00:00:00.000Z",
+            updatedAt: "2026-01-01T00:00:00.000Z"
+          }
+        ],
+        chores: [
+          {
+            id: "chore-1",
+            childProfileId: "child-1",
+            name: "Carry napkins",
+            imageUrl: smallPngDataUrl,
+            recurrence: {
+              days: ["monday"]
+            },
+            requiresApproval: false,
+            createdAt: "2026-01-01T00:00:00.000Z",
+            updatedAt: "2026-01-01T00:00:00.000Z"
+          }
+        ],
+        completions: [
+          {
+            id: "completion-1",
+            itemType: "chore",
+            itemId: "chore-1",
+            childProfileId: "child-1",
+            status: "completed",
+            recordedBy: {
+              id: "parent-1",
+              role: "parentAdmin"
+            },
+            completedAt: "2026-01-01T00:00:00.000Z",
+            celebrationImageUrl: smallPngDataUrl
+          }
+        ],
+        rewards: []
+      },
+      null,
+      2
+    ),
+    "utf8"
+  );
+
+  await startServer();
+
+  const stateResponse = await requestJson("/api/state", {
+    headers: {
+      "x-actor-role": "parentAdmin",
+      "x-actor-id": "parent-1"
+    }
+  });
+  assert.equal(stateResponse.status, 200);
+
+  const state = stateResponse.json as {
+    routines: Array<{ imageUrl?: string; steps: Array<{ imageUrl?: string }> }>;
+    chores: Array<{ imageUrl?: string }>;
+    completions: Array<{ celebrationImageUrl?: string }>;
+  };
+
+  const generatedPaths = [
+    state.routines[0]?.imageUrl,
+    state.routines[0]?.steps[0]?.imageUrl,
+    state.chores[0]?.imageUrl,
+    state.completions[0]?.celebrationImageUrl
+  ].filter((value): value is string => typeof value === "string");
+
+  assert.equal(generatedPaths.length, 4);
+  for (const generatedPath of generatedPaths) {
+    assert.match(
+      generatedPath,
+      new RegExp(`^${escapeRegExp(managedGeneratedAssetMountPath)}/`)
+    );
+    const relativePath = generatedPath.slice(managedGeneratedAssetMountPath.length + 1);
+    assert.equal(existsSync(path.join(generatedAssetDir, relativePath)), true);
+  }
+
+  const rawPersistedState = await readFile(dataFile, "utf8");
+  assert.equal(rawPersistedState.includes("data:image/"), false);
+  assert.equal(rawPersistedState.includes(managedGeneratedAssetMountPath), true);
 });
 
 test("caregiver account routes are not part of the simplified mvp", async () => {
@@ -1206,10 +1485,14 @@ test("parent can request an OpenAI-backed completion image and persist it on the
 
   assert.equal(response.status, 200);
   assert.deepEqual(response.json, {
-    imageUrl: "data:image/png;base64,celebration",
+    imageUrl: (response.json as { imageUrl: string }).imageUrl,
     prompt: "prompt text",
     selectedTheme: "race cars"
   });
+  assert.match(
+    (response.json as { imageUrl: string }).imageUrl,
+    new RegExp(`^${escapeRegExp(managedGeneratedAssetMountPath)}/completions/${completion.id}\\.[a-z0-9]+$`)
+  );
 
   const stateResponse = await requestJson("/api/state", {
     headers: {
@@ -1226,9 +1509,146 @@ test("parent can request an OpenAI-backed completion image and persist it on the
     }>;
   };
   const savedCompletion = state.completions.find((entry) => entry.id === completion.id);
-  assert.equal(savedCompletion?.celebrationImageUrl, "data:image/png;base64,celebration");
+  assert.match(
+    savedCompletion?.celebrationImageUrl ?? "",
+    new RegExp(`^${escapeRegExp(managedGeneratedAssetMountPath)}/completions/${completion.id}\\.[a-z0-9]+$`)
+  );
   assert.equal(savedCompletion?.celebrationPrompt, "prompt text");
   assert.equal(savedCompletion?.celebrationTheme, "race cars");
+});
+
+test("managed generated image assets are served as same-origin static files", async () => {
+  appOptions = {
+    completionImageService: {
+      generateCelebrationImage: async () => ({
+        imageUrl: smallPngDataUrl,
+        prompt: "prompt text",
+        selectedTheme: "race cars"
+      })
+    }
+  };
+
+  if (closeServer) {
+    await closeServer();
+  }
+  await startServer();
+
+  const childProfileResponse = await requestJson("/api/child-profiles", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-actor-role": "parentAdmin",
+      "x-actor-id": "parent-1"
+    },
+    body: JSON.stringify({
+      name: "Milo",
+      color: "#34D399"
+    })
+  });
+  const childProfile = childProfileResponse.json as { id: string };
+
+  const routineResponse = await requestJson("/api/routines", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-actor-role": "parentAdmin",
+      "x-actor-id": "parent-1"
+    },
+    body: JSON.stringify({
+      childProfileId: childProfile.id,
+      name: "Morning helper",
+      imageUrl: smallPngDataUrl,
+      schedule: {
+        days: ["monday"]
+      },
+      steps: [
+        {
+          label: "Get dressed",
+          imageUrl: smallPngDataUrl
+        }
+      ]
+    })
+  });
+  const routine = routineResponse.json as { id: string; steps: Array<{ id: string }> };
+
+  const choreResponse = await requestJson("/api/chores", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-actor-role": "parentAdmin",
+      "x-actor-id": "parent-1"
+    },
+    body: JSON.stringify({
+      childProfileId: childProfile.id,
+      name: "Carry napkins",
+      imageUrl: smallPngDataUrl,
+      recurrence: {
+        days: ["monday"]
+      },
+      requiresApproval: false
+    })
+  });
+  const chore = choreResponse.json as { id: string };
+
+  const completionResponse = await requestJson("/api/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-actor-role": "parentAdmin",
+      "x-actor-id": "parent-1"
+    },
+    body: JSON.stringify({
+      itemType: "chore",
+      itemId: chore.id,
+      childProfileId: childProfile.id,
+      scheduledDay: "monday"
+    })
+  });
+  const completion = completionResponse.json as { id: string };
+
+  await requestJson("/api/completion-images", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-actor-role": "parentAdmin",
+      "x-actor-id": "parent-1"
+    },
+    body: JSON.stringify({
+      completionId: completion.id,
+      childName: "Milo",
+      activityName: "Carry napkins",
+      interestThemes: ["race cars"],
+      celebrationMode: "full"
+    })
+  });
+
+  const stateResponse = await requestJson("/api/state", {
+    headers: {
+      "x-actor-role": "parentAdmin",
+      "x-actor-id": "parent-1"
+    }
+  });
+  const state = stateResponse.json as {
+    routines: Array<{ id: string; imageUrl?: string; steps: Array<{ id: string; imageUrl?: string }> }>;
+    chores: Array<{ id: string; imageUrl?: string }>;
+    completions: Array<{ id: string; celebrationImageUrl?: string }>;
+  };
+
+  const staticAssetPaths = [
+    state.routines.find((entry) => entry.id === routine.id)?.imageUrl,
+    state.routines.find((entry) => entry.id === routine.id)?.steps[0]?.imageUrl,
+    state.chores.find((entry) => entry.id === chore.id)?.imageUrl,
+    state.completions.find((entry) => entry.id === completion.id)?.celebrationImageUrl
+  ].filter((value): value is string => typeof value === "string");
+
+  assert.equal(staticAssetPaths.length, 4);
+
+  for (const pathName of staticAssetPaths) {
+    const response = await fetch(`${baseUrl}${pathName}`);
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("content-type"), "image/png");
+    assert.equal(Buffer.from(await response.arrayBuffer()).toString("utf8"), "ABC");
+  }
 });
 
 test("completion image failures are recoverable", async () => {

@@ -1446,7 +1446,7 @@ describe("App", () => {
             itemType: "chore",
             childProfileId: "child-1",
             status: "completed",
-            scheduledDay: "monday"
+            scheduledDay: today
           }),
           { status: 201 }
         )
@@ -1844,6 +1844,139 @@ describe("App", () => {
     ).toBe(true);
   });
 
+  it("does not backfill saved generated activity images when they are served by asset urls", async () => {
+    (window as Window & { __enableInstructionalBackfill__?: boolean }).__enableInstructionalBackfill__ =
+      true;
+    const instructionalGenerator = vi.fn(async ({ activityName, stepLabels }) => ({
+      imageUrl: `data:image/svg+xml;${encodeURIComponent(
+        `${activityName}:${stepLabels.join("|")}`
+      )}`,
+      prompt: `${activityName}:${stepLabels.join("|")}`
+    }));
+    __setInstructionalImageGeneratorForTests(instructionalGenerator);
+
+    fetchMock
+      .mockResolvedValueOnce(
+        stateResponse({
+          childProfiles: [
+            {
+              id: "child-1",
+              name: "Milo",
+              color: "#34D399",
+              motivators: ["race cars"]
+            }
+          ],
+          routines: [
+            {
+              id: "routine-1",
+              name: "morning routine",
+              childProfileId: "child-1",
+              imageUrl: "/generated-assets/routines/routine-1.png",
+              schedule: { days: ["monday"] },
+              reward: {
+                type: "stars",
+                amount: 1
+              },
+              steps: [
+                {
+                  id: "step-1",
+                  label: "brush teeth",
+                  order: 0,
+                  imageUrl: "/generated-assets/routines/routine-1/steps/step-1.png"
+                },
+                {
+                  id: "step-2",
+                  label: "comb hair",
+                  order: 1,
+                  imageUrl: "/generated-assets/routines/routine-1/steps/step-2.png"
+                }
+              ]
+            }
+          ],
+          chores: [
+            {
+              id: "chore-1",
+              name: "put dishes in dishwasher",
+              childProfileId: "child-1",
+              imageUrl: "/generated-assets/chores/chore-1.png",
+              recurrence: { days: ["monday"] },
+              requiresApproval: false
+            }
+          ]
+        })
+      )
+      .mockResolvedValueOnce(
+        todayPlanResponse({
+          day: "monday",
+          routines: [
+            {
+              id: "routine-1",
+              name: "morning routine",
+              childProfileId: "child-1",
+              imageUrl: "/generated-assets/routines/routine-1.png",
+              schedule: { days: ["monday"] },
+              reward: {
+                type: "stars",
+                amount: 1
+              },
+              steps: [
+                {
+                  id: "step-1",
+                  label: "brush teeth",
+                  order: 0,
+                  imageUrl: "/generated-assets/routines/routine-1/steps/step-1.png"
+                },
+                {
+                  id: "step-2",
+                  label: "comb hair",
+                  order: 1,
+                  imageUrl: "/generated-assets/routines/routine-1/steps/step-2.png"
+                }
+              ]
+            }
+          ],
+          chores: [
+            {
+              id: "chore-1",
+              name: "put dishes in dishwasher",
+              childProfileId: "child-1",
+              imageUrl: "/generated-assets/chores/chore-1.png",
+              recurrence: { days: ["monday"] },
+              requiresApproval: false
+            }
+          ]
+        })
+      );
+
+    render(<App />);
+
+    expect(await screen.findByAltText(/picture for morning routine/i)).toHaveAttribute(
+      "src",
+      "/generated-assets/routines/routine-1.png"
+    );
+    expect(await screen.findByAltText(/picture for brush teeth/i)).toHaveAttribute(
+      "src",
+      "/generated-assets/routines/routine-1/steps/step-1.png"
+    );
+    expect(await screen.findByAltText(/picture for comb hair/i)).toHaveAttribute(
+      "src",
+      "/generated-assets/routines/routine-1/steps/step-2.png"
+    );
+    expect(await screen.findByAltText(/picture for put dishes in dishwasher/i)).toHaveAttribute(
+      "src",
+      "/generated-assets/chores/chore-1.png"
+    );
+
+    expect(instructionalGenerator).not.toHaveBeenCalled();
+    expect(
+      fetchMock.mock.calls.some(
+        ([url, init]) =>
+          (url === "/api/routines/routine-1" || url === "/api/chores/chore-1") &&
+          init?.method === "PATCH"
+      )
+    ).toBe(false);
+  });
+
   it("rehydrates a saved completion image into the weekly matrix after state load", async () => {
     const today = currentWeekday();
 
@@ -1889,6 +2022,54 @@ describe("App", () => {
     expect(await screen.findByAltText(/celebration image for put dishes in dishwasher/i)).toHaveAttribute(
       "src",
       "data:image/png;base64,persisted"
+    );
+  });
+
+  it("rehydrates a saved completion image from an asset url into the weekly matrix after state load", async () => {
+    const today = currentWeekday();
+
+    fetchMock
+      .mockResolvedValueOnce(
+        stateResponse({
+          childProfiles: [
+            {
+              id: "child-1",
+              name: "Milo",
+              color: "#34D399",
+              motivators: ["race cars"]
+            }
+          ],
+          chores: [
+            {
+              id: "chore-1",
+              name: "put dishes in dishwasher",
+              childProfileId: "child-1",
+              recurrence: { days: [today] },
+              requiresApproval: false
+            }
+          ],
+          completions: [
+            {
+              id: "completion-1",
+              itemId: "chore-1",
+              itemType: "chore",
+              childProfileId: "child-1",
+              status: "completed",
+              scheduledDay: today,
+              celebrationImageUrl: "/generated-assets/completions/completion-1.png",
+              celebrationPrompt: "saved prompt",
+              celebrationTheme: "race cars"
+            }
+          ]
+        })
+      )
+      .mockResolvedValueOnce(todayPlanResponse());
+
+    render(<App />);
+
+    expect(await screen.findByAltText(/celebration image for put dishes in dishwasher/i)).toHaveAttribute(
+      "src",
+      "/generated-assets/completions/completion-1.png"
     );
   });
 

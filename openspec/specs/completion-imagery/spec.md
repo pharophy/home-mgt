@@ -22,7 +22,8 @@ The system SHALL generate a custom celebratory image when a task is marked compl
 - **WHEN** the client requests a completion image for a recorded completion
 - **THEN** the server generates the celebratory image
 - **THEN** the server saves the generated image fields on that completion record
-- **THEN** subsequent state loads include the saved completion image without requiring regeneration
+- **THEN** subsequent state loads include a saved completion image reference without requiring regeneration
+- **THEN** that saved completion image reference can be resolved by the browser without embedding the full sticker bytes inside bootstrap JSON
 
 #### Scenario: Completion image prompt is built for a child with interests
 - **WHEN** the server builds a completion-image prompt for a child whose profile includes configured interests
@@ -119,3 +120,4 @@ The system SHALL provide a dedicated History destination that shows all saved ge
 #### Scenario: No stickers have been generated
 - **WHEN** the parent opens the History destination with no saved sticker completions
 - **THEN** the system shows an empty state explaining that sticker history will appear after completions generate art
+
