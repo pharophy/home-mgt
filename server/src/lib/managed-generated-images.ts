@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -55,6 +56,14 @@ async function normalizeGeneratedImageReference(
   }
 
   if (isManagedGeneratedAssetPath(imageUrl)) {
+    const managedFilePath = managedGeneratedAssetUrlToFilePath(imageUrl, assetRootDir);
+    if (managedFilePath && !existsSync(managedFilePath)) {
+      return {
+        imageUrl: undefined,
+        changed: true
+      };
+    }
+
     return { imageUrl, changed: false };
   }
 

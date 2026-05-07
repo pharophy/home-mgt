@@ -84,3 +84,19 @@ test("uses the faster sticker generation model without lowering medium quality",
   assert.equal(generatedRequest.size, "1024x1024");
   assert.equal(generatedRequest.quality, "medium");
 });
+
+test("can regenerate a completion sticker directly from a saved prompt", async () => {
+  const service = createCompletionImageService("test-key", {
+    client: {
+      images: {
+        generate: async () => ({
+          data: [{ b64_json: "saved-prompt-image" }]
+        })
+      }
+    }
+  });
+
+  const imageUrl = await service.generateCelebrationImageFromPrompt("Saved prompt");
+
+  assert.equal(imageUrl, "data:image/png;base64,saved-prompt-image");
+});

@@ -61,6 +61,7 @@ export interface CompletionImageResult {
 }
 
 export interface CompletionImageService {
+  generateCelebrationImageFromPrompt(prompt: string): Promise<string>;
   generateCelebrationImage(
     request: CompletionImageRequest
   ): Promise<CompletionImageResult>;

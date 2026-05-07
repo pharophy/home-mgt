@@ -57,6 +57,12 @@ function previousWeekday(day: ReturnType<typeof currentWeekday>) {
   return weekOrder[(index + weekOrder.length - 1) % weekOrder.length];
 }
 
+function isoDaysAgo(daysAgo: number) {
+  const date = new Date();
+  date.setDate(date.getDate() - daysAgo);
+  return date.toISOString();
+}
+
 function setViewportWidth(width: number) {
   Object.defineProperty(window, "innerWidth", {
     configurable: true,
@@ -1111,7 +1117,8 @@ describe("App", () => {
             itemType: "chore",
             childProfileId: "child-1",
             status: "completed",
-            scheduledDay: today
+            scheduledDay: today,
+            completedAt: new Date().toISOString()
           }),
           { status: 201 }
         )
@@ -1249,7 +1256,8 @@ describe("App", () => {
           itemType: "chore",
           childProfileId: "child-1",
           status: "completed",
-          scheduledDay: today
+          scheduledDay: today,
+          completedAt: new Date().toISOString()
         }),
         { status: 201 }
       )
@@ -1446,7 +1454,8 @@ describe("App", () => {
             itemType: "chore",
             childProfileId: "child-1",
             status: "completed",
-            scheduledDay: today
+            scheduledDay: today,
+            completedAt: new Date().toISOString()
           }),
           { status: 201 }
         )
@@ -2008,6 +2017,7 @@ describe("App", () => {
               childProfileId: "child-1",
               status: "completed",
               scheduledDay: today,
+              completedAt: isoDaysAgo(0),
               celebrationImageUrl: "data:image/png;base64,persisted",
               celebrationPrompt: "saved prompt",
               celebrationTheme: "race cars"
@@ -2056,6 +2066,7 @@ describe("App", () => {
               childProfileId: "child-1",
               status: "completed",
               scheduledDay: today,
+              completedAt: isoDaysAgo(0),
               celebrationImageUrl: "/generated-assets/completions/completion-1.png",
               celebrationPrompt: "saved prompt",
               celebrationTheme: "race cars"
@@ -2105,6 +2116,7 @@ describe("App", () => {
               childProfileId: "child-1",
               status: "completed",
               scheduledDay: earlierDay,
+              completedAt: isoDaysAgo(1),
               celebrationImageUrl: "data:image/png;base64,persisted-earlier",
               celebrationPrompt: "saved prompt",
               celebrationTheme: "race cars"
@@ -2403,7 +2415,8 @@ describe("App", () => {
             itemType: "chore",
             childProfileId: "child-1",
             status: "completed",
-            scheduledDay: today
+            scheduledDay: today,
+            completedAt: new Date().toISOString()
           }),
           { status: 201 }
         )
@@ -2540,7 +2553,8 @@ describe("App", () => {
             itemType: "chore",
             childProfileId: "child-1",
             status: "completed",
-            scheduledDay: today
+            scheduledDay: today,
+            completedAt: new Date().toISOString()
           }),
           { status: 201 }
         )
@@ -2658,7 +2672,7 @@ describe("App", () => {
               status: "completed",
               scheduledDay: earlierDay,
               celebrationImageUrl: "data:image/png;base64,earlier-sticker",
-              completedAt: "2026-05-01T18:15:00.000Z"
+              completedAt: isoDaysAgo(1)
             }
           ]
         })

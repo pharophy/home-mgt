@@ -199,6 +199,11 @@ test("production app serves the built client shell and static assets", async () 
   const assetResponse = await fetch(`${baseUrl}/assets/app.js`);
   assert.equal(assetResponse.status, 200);
   assert.equal(await assetResponse.text(), "console.log('prod');");
+
+  const missingGeneratedAssetResponse = await fetch(
+    `${baseUrl}/generated-assets/does-not-exist.png`
+  );
+  assert.equal(missingGeneratedAssetResponse.status, 404);
 });
 
 test("parent can save a routine with a large instructional image payload", async () => {
@@ -1405,6 +1410,7 @@ test("deleting a routine removes related routine-step completion history", async
 test("parent can request an OpenAI-backed completion image and persist it on the completion", async () => {
   appOptions = {
     completionImageService: {
+      generateCelebrationImageFromPrompt: async () => "data:image/png;base64,celebration",
       generateCelebrationImage: async () => ({
         imageUrl: "data:image/png;base64,celebration",
         prompt: "prompt text",
@@ -1520,6 +1526,7 @@ test("parent can request an OpenAI-backed completion image and persist it on the
 test("managed generated image assets are served as same-origin static files", async () => {
   appOptions = {
     completionImageService: {
+      generateCelebrationImageFromPrompt: async () => smallPngDataUrl,
       generateCelebrationImage: async () => ({
         imageUrl: smallPngDataUrl,
         prompt: "prompt text",
@@ -1654,6 +1661,7 @@ test("managed generated image assets are served as same-origin static files", as
 test("completion image failures are recoverable", async () => {
   appOptions = {
     completionImageService: {
+      generateCelebrationImageFromPrompt: async () => "data:image/png;base64,celebration",
       generateCelebrationImage: async () => {
         throw new Error("OpenAI unavailable");
       }

@@ -11,9 +11,9 @@
 
 ## Local development
 
-- `npm run dev` starts the Vite client and Express server together
+- `npm run dev` starts the Vite client on `5173` and the Express dev backend on `3002`
 - `npm run build` builds both workspaces
-- `npm run start` starts the built server
+- `npm run start` starts the built server on `3001`
 - `npm run prod` builds both workspaces and then starts the production server locally
 - `npm run prod:startup:install` registers the current Windows user to start prod on logon
 - `npm run prod:startup:uninstall` removes that Windows autostart registration
@@ -21,6 +21,7 @@
 - `npm test --workspace client` runs the client UI tests
 - Set `PRESCHOOL_SQL_CONNECTION_STRING` to enable the SQL-backed participation store; otherwise the server falls back to `server-data.json`
 - Set `HOST=0.0.0.0` and `PORT=3001` to bind the production server for local-network access if needed
+- Override `PORT` before `npm run dev` to change the backend dev port; the client proxy follows that port automatically unless `VITE_API_TARGET` is set explicitly
 
 The Windows autostart command uses a current-user logon task. That means the production server starts after you sign in to Windows, not before the login screen appears.
 

@@ -85,7 +85,30 @@ export function createCompletionImageService(
 ): CompletionImageService {
   const client = options.client ?? (apiKey ? new OpenAI({ apiKey }) : null);
 
+  async function generateImageFromPrompt(prompt: string): Promise<string> {
+    const response = await client!.images.generate({
+      model: "gpt-image-1-mini",
+      prompt,
+      size: "1024x1024",
+      quality: "medium"
+    });
+
+    const imageBase64 = response.data?.[0]?.b64_json;
+    if (!imageBase64) {
+      throw new Error("OpenAI image response did not include image data");
+    }
+
+    return `data:image/png;base64,${imageBase64}`;
+  }
+
   return {
+    async generateCelebrationImageFromPrompt(prompt: string): Promise<string> {
+      if (!apiKey) {
+        throw new Error("OpenAI API key is not configured");
+      }
+
+      return generateImageFromPrompt(prompt);
+    },
     async generateCelebrationImage(
       request: CompletionImageRequest
     ): Promise<CompletionImageResult> {
@@ -106,20 +129,8 @@ export function createCompletionImageService(
         visualVariation
       });
 
-      const response = await client!.images.generate({
-        model: "gpt-image-1-mini",
-        prompt,
-        size: "1024x1024",
-        quality: "medium"
-      });
-
-      const imageBase64 = response.data?.[0]?.b64_json;
-      if (!imageBase64) {
-        throw new Error("OpenAI image response did not include image data");
-      }
-
       return {
-        imageUrl: `data:image/png;base64,${imageBase64}`,
+        imageUrl: await generateImageFromPrompt(prompt),
         prompt,
         selectedTheme
       };

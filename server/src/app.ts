@@ -53,7 +53,7 @@ export function createApp(options: CreateAppOptions = {}): Express {
 
   if (clientDistDir) {
     app.use(express.static(clientDistDir));
-    app.get(/^(?!\/api(?:\/|$)).*/, (req, res, next) => {
+    app.get(/^(?!\/(?:api|generated-assets)(?:\/|$)).*/, (req, res, next) => {
       if (req.method !== "GET" && req.method !== "HEAD") {
         next();
         return;

@@ -22,6 +22,7 @@ import type {
 import {
   buildWeeklyMatrixRows,
   currentWeekday,
+  isCompletionInVisibleWeek,
   toggleDay
 } from "./app/view-model";
 import { HistoryPage } from "./components/HistoryPage";
@@ -856,16 +857,19 @@ export default function App() {
     });
   }, [activityDraft.name, activityDraft.steps, activityEditorOpen, selectedChildId]);
 
+  const now = new Date();
+  const currentDay = currentWeekday(now.getDay());
   const weeklyMatrixRows = selectedChildId
     ? buildWeeklyMatrixRows({
         childProfileId: selectedChildId,
         routines: state.routines,
         chores: state.chores,
         completions: state.completions,
-        currentDay: currentWeekday()
+        currentDay,
+        now
       })
     : [];
-  const weekDayNumbers = buildWeekDayNumbers();
+  const weekDayNumbers = buildWeekDayNumbers(now);
 
   useEffect(() => {
     if (!shouldBackfillInstructionalImages) {
@@ -1117,7 +1121,10 @@ export default function App() {
 
   const persistedCompletionArtwork = Object.fromEntries(
     state.completions
-      .filter((completion) => Boolean(completion.celebrationImageUrl))
+      .filter(
+        (completion) =>
+          Boolean(completion.celebrationImageUrl) && isCompletionInVisibleWeek(completion, now)
+      )
       .map((completion) => [
         completionArtworkKey(completion.childProfileId, completion.scheduledDay, completion.itemId),
         {
@@ -1414,7 +1421,7 @@ export default function App() {
             childProfiles={state.childProfiles}
             selectedChildId={selectedChildId}
             rows={weeklyMatrixRows}
-            currentDay={currentWeekday()}
+            currentDay={currentDay}
             dayNumbers={weekDayNumbers}
             artwork={weeklyMatrixArtwork}
             onSelectChild={(childId) => void handleSelectChild(childId)}

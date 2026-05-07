@@ -122,3 +122,32 @@ test("managed generated image store migrates legacy inline generated images on r
     await rm(assetRootDir, { recursive: true, force: true });
   }
 });
+
+test("managed generated image store clears broken managed asset references on read", async () => {
+  const assetRootDir = await mkdtemp(path.join(os.tmpdir(), "home-mgt-managed-assets-"));
+  try {
+    const state = createDefaultState();
+    state.chores.push({
+      id: "chore-1",
+      childProfileId: "child-1",
+      name: "Carry napkins",
+      imageUrl: `${managedGeneratedAssetMountPath}/chores/chore-1.png`,
+      recurrence: {
+        days: ["monday"]
+      },
+      requiresApproval: false,
+      createdAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: "2026-01-01T00:00:00.000Z"
+    });
+
+    const delegate = new InMemoryStore(state);
+    const store = new ManagedGeneratedImageStore(delegate, assetRootDir);
+
+    const loaded = await store.read();
+
+    assert.equal(loaded.chores[0]?.imageUrl, undefined);
+    assert.equal(delegate.state.chores[0]?.imageUrl, undefined);
+  } finally {
+    await rm(assetRootDir, { recursive: true, force: true });
+  }
+});
