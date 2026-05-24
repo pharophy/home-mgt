@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import path from "node:path";
 
 import type { Chore, Completion, Routine, RoutineStep } from "../domain/types.js";
@@ -20,7 +21,14 @@ function decodeUtf8Payload(payload: string): Buffer {
 export function resolveManagedGeneratedAssetDir(cwd: string): string {
   const normalizedCwd = path.resolve(cwd);
   const serverDir = path.basename(normalizedCwd).toLowerCase() === "server";
-  const repoRoot = serverDir ? path.dirname(normalizedCwd) : normalizedCwd;
+  const currentDir = path.basename(normalizedCwd).toLowerCase() === "current";
+  const repoRoot = serverDir || currentDir ? path.dirname(normalizedCwd) : normalizedCwd;
+  const sharedAssetDir = path.join(repoRoot, "shared", "generated-assets");
+
+  if (existsSync(path.join(repoRoot, "shared"))) {
+    return sharedAssetDir;
+  }
+
   return path.join(repoRoot, "generated-assets");
 }
 

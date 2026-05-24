@@ -1,0 +1,13 @@
+<svg width="640" height="180" viewBox="0 0 640 180" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="starstepOrbitTitle starstepOrbitDesc">
+  <title id="starstepOrbitTitle">Starstep orbit logo</title>
+  <desc id="starstepOrbitDesc">A circular badge with an orbiting star above a stepping path, followed by the Starstep wordmark.</desc>
+  <circle cx="92" cy="90" r="68" fill="#F6F0E4"/>
+  <path d="M47 108C55 122 69 131 87 133C111 136 133 122 143 100" stroke="#59B8A6" stroke-width="10" stroke-linecap="round"/>
+  <path d="M57 111C57 101.611 64.6112 94 74 94H82C91.3888 94 99 101.611 99 111C99 120.389 91.3888 128 82 128H74C64.6112 128 57 120.389 57 111Z" fill="#F0A34A"/>
+  <path d="M80 86C80 76.6112 87.6112 69 97 69H105C114.389 69 122 76.6112 122 86C122 95.3888 114.389 103 105 103H97C87.6112 103 80 95.3888 80 86Z" fill="#7D8CF2"/>
+  <path d="M104 63C104 53.6112 111.611 46 121 46H129C138.389 46 146 53.6112 146 63C146 72.3888 138.389 80 129 80H121C111.611 80 104 72.3888 104 63Z" fill="#59B8A6"/>
+  <path d="M133 38C145 38 155 45 160 55" stroke="#243047" stroke-width="8" stroke-linecap="round"/>
+  <path d="M159.198 29.3935C159.994 26.9435 163.459 26.9435 164.255 29.3935L167.285 38.7173C167.641 39.8138 168.663 40.5559 169.816 40.5559H179.62C182.196 40.5559 183.267 43.8528 181.183 45.3667L173.252 51.1291C172.319 51.8069 171.929 53.0082 172.286 54.1047L175.315 63.4285C176.111 65.8785 173.306 67.9163 171.223 66.4024L163.291 60.64C162.358 59.9622 161.095 59.9622 160.162 60.64L152.23 66.4024C150.147 67.9163 147.342 65.8785 148.138 63.4285L151.168 54.1047C151.524 53.0082 151.134 51.8069 150.201 51.1291L142.27 45.3667C140.186 43.8528 141.257 40.5559 143.833 40.5559H153.637C154.79 40.5559 155.812 39.8138 156.168 38.7173L159.198 29.3935Z" fill="#F15D5F"/>
+  <text x="194" y="96" fill="#243047" font-family="Avenir Next, Nunito, Trebuchet MS, sans-serif" font-size="64" font-weight="700" letter-spacing="-1.5">Starstep</text>
+  <text x="196" y="128" fill="#5A657A" font-family="Avenir Next, Nunito, Trebuchet MS, sans-serif" font-size="20" font-weight="600" letter-spacing="1.4">CALM ROUTINES. CLEAR PROGRESS.</text>
+</svg>

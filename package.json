@@ -16,6 +16,7 @@
     "prod:startup:uninstall": "node scripts/windows-prod-startup.mjs uninstall",
     "test:prod": "node scripts/prod-launcher.test.mjs",
     "test:startup": "node scripts/windows-prod-startup.test.mjs",
+    "smoke:starstep": "node scripts/smoke-check-starstep.mjs",
     "test": "npm run test --workspace server",
     "pretest:e2e": "npm run build",
     "test:e2e": "playwright test"

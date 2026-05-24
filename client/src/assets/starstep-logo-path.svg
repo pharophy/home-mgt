@@ -1,0 +1,12 @@
+<svg width="640" height="180" viewBox="0 0 640 180" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="starstepPathTitle starstepPathDesc">
+  <title id="starstepPathTitle">Starstep path logo</title>
+  <desc id="starstepPathDesc">A winding path made of rounded stepping stones rising toward a star, followed by the Starstep wordmark.</desc>
+  <rect x="20" y="20" width="146" height="146" rx="46" fill="#EEF6F0"/>
+  <path d="M54 120C62 132 76 138 90 138C113 138 133 121 138 99C142 82 133 63 117 53" stroke="#243047" stroke-width="8" stroke-linecap="round"/>
+  <rect x="52" y="109" width="34" height="24" rx="12" fill="#F0A34A"/>
+  <rect x="83" y="94" width="32" height="22" rx="11" fill="#7D8CF2"/>
+  <rect x="110" y="71" width="28" height="20" rx="10" fill="#59B8A6"/>
+  <path d="M111.248 37.2531C112.214 34.2799 116.418 34.2799 117.384 37.2531L121.526 50.0042C121.959 51.3386 123.202 52.2423 124.605 52.2423H138.014C141.143 52.2423 142.444 56.2387 139.913 58.0773L129.065 65.9589C127.93 66.7832 127.455 68.2459 127.889 69.5803L132.031 82.3315C132.996 85.3047 129.593 87.778 127.062 85.9394L116.214 78.0578C115.079 77.2335 113.553 77.2335 112.418 78.0578L101.57 85.9394C99.0386 87.778 95.6358 85.3047 96.6014 82.3315L100.744 69.5803C101.177 68.2459 100.702 66.7832 99.567 65.9589L88.7191 58.0773C86.1878 56.2387 87.4889 52.2423 90.6182 52.2423H104.027C105.43 52.2423 106.673 51.3386 107.106 50.0042L111.248 37.2531Z" fill="#F15D5F"/>
+  <text x="194" y="96" fill="#243047" font-family="Avenir Next, Nunito, Trebuchet MS, sans-serif" font-size="64" font-weight="700" letter-spacing="-1.5">Starstep</text>
+  <text x="198" y="128" fill="#5A657A" font-family="Avenir Next, Nunito, Trebuchet MS, sans-serif" font-size="20" font-weight="600" letter-spacing="1.4">ONE STEP AT A TIME</text>
+</svg>

@@ -1,0 +1,12 @@
+<svg width="640" height="180" viewBox="0 0 640 180" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="starstepLogoTitle starstepLogoDesc">
+  <title id="starstepLogoTitle">Starstep logo</title>
+  <desc id="starstepLogoDesc">A rounded square icon with ascending stepping stones leading to a star, followed by the Starstep wordmark.</desc>
+  <rect x="20" y="20" width="140" height="140" rx="40" fill="#F7F4EA"/>
+  <path d="M54 118C54 104.745 64.7452 94 78 94H93C106.255 94 117 104.745 117 118C117 131.255 106.255 142 93 142H78C64.7452 142 54 131.255 54 118Z" fill="#F0A34A"/>
+  <path d="M84 82C84 68.7452 94.7452 58 108 58H123C136.255 58 147 68.7452 147 82C147 95.2548 136.255 106 123 106H108C94.7452 106 84 95.2548 84 82Z" fill="#59B8A6"/>
+  <path d="M48 75C48 61.7452 58.7452 51 72 51H87C100.255 51 111 61.7452 111 75C111 88.2548 100.255 99 87 99H72C58.7452 99 48 88.2548 48 75Z" fill="#7D8CF2"/>
+  <path d="M65 117L86 84L113 84L130 62" stroke="#243047" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M120.071 41.6282C120.815 39.338 124.055 39.338 124.799 41.6282L128.663 53.5238C128.996 54.5486 129.951 55.2423 131.028 55.2423H143.537C145.945 55.2423 146.946 58.3242 144.997 59.7405L134.878 67.0925C134.006 67.7265 133.642 68.8494 133.975 69.8742L137.839 81.7697C138.583 84.06 135.962 85.9644 134.013 84.5481L123.894 77.1961C123.022 76.5621 121.848 76.5621 120.976 77.1961L110.857 84.5481C108.908 85.9644 106.287 84.06 107.031 81.7697L110.895 69.8742C111.228 68.8494 110.864 67.7265 109.992 67.0925L99.8729 59.7405C97.9242 58.3242 98.9255 55.2423 101.333 55.2423H113.842C114.919 55.2423 115.874 54.5486 116.207 53.5238L120.071 41.6282Z" fill="#F15D5F"/>
+  <text x="194" y="96" fill="#243047" font-family="Avenir Next, Nunito, Trebuchet MS, sans-serif" font-size="64" font-weight="700" letter-spacing="-1.5">Starstep</text>
+  <text x="198" y="128" fill="#5A657A" font-family="Avenir Next, Nunito, Trebuchet MS, sans-serif" font-size="20" font-weight="600" letter-spacing="1.8">VISUAL ROUTINES FOR SMALL WINS</text>
+</svg>

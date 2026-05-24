@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   TASK_NAME,
   buildInstallTaskCommand,
+  buildRunTaskCommand,
   buildUninstallTaskCommand,
   ensureWindows
 } from "./windows-prod-startup.mjs";
@@ -13,32 +14,43 @@ import {
     windir: "C:\\Windows"
   });
 
-  assert.equal(command.file, "reg");
+  assert.equal(command.file, "schtasks");
   assert.deepEqual(command.args.slice(0, 7), [
-    "add",
-    "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
-    "/v",
+    "/Create",
+    "/TN",
     TASK_NAME,
-    "/t",
-    "REG_SZ",
-    "/d"
+    "/SC",
+    "ONSTART",
+    "/RU",
+    "SYSTEM"
   ]);
-  assert.match(command.args[7], /^"C:\\Windows\\System32\\WindowsPowerShell\\v1\.0\\powershell\.exe"/);
-  assert.match(command.args[7], /-WindowStyle Hidden/);
-  assert.match(command.args[7], /scripts\\prod-startup\.ps1/);
-  assert.equal(command.args[8], "/f");
+  assert.equal(command.args[7], "/TR");
+  assert.match(command.args[8], /^"C:\\Windows\\System32\\WindowsPowerShell\\v1\.0\\powershell\.exe"/);
+  assert.match(command.args[8], /-WindowStyle Hidden/);
+  assert.match(command.args[8], /scripts\\prod-startup\.ps1/);
+  assert.equal(command.args.at(-1), "/F");
 }
 
 {
   const command = buildUninstallTaskCommand();
 
-  assert.equal(command.file, "reg");
+  assert.equal(command.file, "schtasks");
   assert.deepEqual(command.args, [
-    "delete",
-    "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
-    "/v",
+    "/Delete",
+    "/TN",
     TASK_NAME,
-    "/f"
+    "/F"
+  ]);
+}
+
+{
+  const command = buildRunTaskCommand();
+
+  assert.equal(command.file, "schtasks");
+  assert.deepEqual(command.args, [
+    "/Run",
+    "/TN",
+    TASK_NAME
   ]);
 }
 

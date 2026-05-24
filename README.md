@@ -15,15 +15,16 @@
 - `npm run build` builds both workspaces
 - `npm run start` starts the built server on `3001`
 - `npm run prod` builds both workspaces and then starts the production server locally
-- `npm run prod:startup:install` registers the current Windows user to start prod on logon
-- `npm run prod:startup:uninstall` removes that Windows autostart registration
+- `npm run prod:startup:install` creates the `HomeMgtProd` scheduled task for Windows production startup
+- `npm run prod:startup:uninstall` removes that Windows startup registration
 - `npm test --workspace server` runs the server integration tests
 - `npm test --workspace client` runs the client UI tests
-- Set `PRESCHOOL_SQL_CONNECTION_STRING` to enable the SQL-backed participation store; otherwise the server falls back to `server-data.json`
+- `npm run --workspace server migrate` applies pending SQL migrations
+- Set `PRESCHOOL_SQL_CONNECTION_STRING` in `.env` or `.env.prod`; real app startup requires SQL-backed persistence and will fail fast if it is missing
 - Set `HOST=0.0.0.0` and `PORT=3001` to bind the production server for local-network access if needed
 - Override `PORT` before `npm run dev` to change the backend dev port; the client proxy follows that port automatically unless `VITE_API_TARGET` is set explicitly
 
-The Windows autostart command uses a current-user logon task. That means the production server starts after you sign in to Windows, not before the login screen appears.
+The Windows production startup helper now targets a scheduled-task-based startup path. On the existing Starstep host, IIS remains the public entry point and proxies `starstep.blabberjax.com` to the Node app on `127.0.0.1:3001`. Production deployments use a release artifact delivered over SSM rather than Git operations on the server.
 
 ## Onboarding flow
 
