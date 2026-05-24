@@ -1,0 +1,11 @@
+<svg width="640" height="180" viewBox="0 0 640 180" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="starstepSparkTitle starstepSparkDesc">
+  <title id="starstepSparkTitle">Starstep spark logo</title>
+  <desc id="starstepSparkDesc">A rounded badge with a large star and spark-like step blocks underneath, followed by the Starstep wordmark.</desc>
+  <rect x="20" y="20" width="146" height="146" rx="46" fill="#FFF6E8"/>
+  <path d="M89.3593 38.7814C90.7695 34.4429 96.9057 34.4429 98.3159 38.7814L105.638 61.3151C106.269 63.2588 108.082 64.5744 110.124 64.5744H133.818C138.389 64.5744 140.29 70.4101 136.592 73.0973L117.426 87.0234C115.776 88.2226 115.085 90.3472 115.716 92.2908L123.038 114.825C124.448 119.163 119.481 122.771 115.783 120.084L96.6176 106.158C94.9674 104.959 92.7078 104.959 91.0576 106.158L71.8918 120.084C68.1935 122.771 63.2271 119.163 64.6373 114.825L71.9594 92.2908C72.5909 90.3472 71.9002 88.2226 70.25 87.0234L51.0842 73.0973C47.3859 70.4101 49.2867 64.5744 53.8574 64.5744H77.5517C79.5944 64.5744 81.4069 63.2588 82.0384 61.3151L89.3593 38.7814Z" fill="#F15D5F"/>
+  <rect x="52" y="118" width="30" height="18" rx="9" fill="#7D8CF2"/>
+  <rect x="86" y="108" width="30" height="28" rx="10" fill="#59B8A6"/>
+  <rect x="120" y="96" width="16" height="40" rx="8" fill="#F0A34A"/>
+  <text x="194" y="96" fill="#243047" font-family="Avenir Next, Nunito, Trebuchet MS, sans-serif" font-size="64" font-weight="700" letter-spacing="-1.5">Starstep</text>
+  <text x="197" y="128" fill="#5A657A" font-family="Avenir Next, Nunito, Trebuchet MS, sans-serif" font-size="20" font-weight="600" letter-spacing="1.4">VISUAL ROUTINES WITH A REWARD MOMENT</text>
+</svg>

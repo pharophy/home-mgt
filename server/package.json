@@ -7,6 +7,7 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
+    "migrate": "tsx src/scripts/run-migrations.ts",
     "recover:completion-images": "tsx src/scripts/recover-completion-images.ts",
     "test": "node --import tsx --test src/**/*.test.ts"
   },

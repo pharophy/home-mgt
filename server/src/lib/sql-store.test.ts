@@ -151,14 +151,29 @@ test("createParticipationStore prefers the sql store when a connection string is
   assert.equal(store.constructor.name, "SqlParticipationStore");
 });
 
-test("buildMssqlConnectionConfig preserves the raw connection string for named SQL instances", () => {
+test("buildMssqlConnectionConfig strips boolean ODBC attributes from named SQL instance strings", () => {
   const connectionString =
     "Driver={ODBC Driver 17 for SQL Server};Server=.\\SQLExpress;Database=HomeMgt;Trusted_Connection=Yes;TrustServerCertificate=Yes;";
 
   assert.deepEqual(buildMssqlConnectionConfig(connectionString), {
-    connectionString,
+    connectionString:
+      "Driver={ODBC Driver 17 for SQL Server};Server=.\\SQLExpress;Database=HomeMgt;",
     options: {
       trustedConnection: true,
+      trustServerCertificate: true
+    }
+  });
+});
+
+test("buildMssqlConnectionConfig strips false boolean ODBC attributes from SQL auth strings", () => {
+  const connectionString =
+    "Driver={ODBC Driver 17 for SQL Server};Server=i-08eb36fff6e5b9f2a.us-west-2.compute.internal,1433\\SQLEXPRESS;Database=StarStep;User ID=Bjx_Admin;Password=secret;Trusted_Connection=False;TrustServerCertificate=True;";
+
+  assert.deepEqual(buildMssqlConnectionConfig(connectionString), {
+    connectionString:
+      "Driver={ODBC Driver 17 for SQL Server};Server=i-08eb36fff6e5b9f2a.us-west-2.compute.internal,1433\\SQLEXPRESS;Database=StarStep;User ID=Bjx_Admin;Password=secret;",
+    options: {
+      trustedConnection: false,
       trustServerCertificate: true
     }
   });

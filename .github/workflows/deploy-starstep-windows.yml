@@ -1,0 +1,111 @@
+name: Deploy Starstep Windows
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: windows-latest
+    env:
+      STARSTEP_APP_ROOT: C:\HostingSpaces\starstep.blabberjax.com\app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify Windows startup helper
+        run: node scripts/windows-prod-startup.test.mjs
+
+      - name: Verify deploy artifact helper
+        run: node scripts/deploy-artifact.test.mjs
+
+      - name: Verify server tests
+        run: npm test --workspace server
+
+      - name: Build workspaces
+        run: npm run build
+
+      - name: Stage deployment artifact
+        shell: pwsh
+        run: |
+          $artifactRoot = Join-Path $env:RUNNER_TEMP "starstep-artifact"
+          $archivePath = Join-Path $env:RUNNER_TEMP "starstep-release-${{ github.sha }}.zip"
+          if (Test-Path -LiteralPath $artifactRoot) {
+            Remove-Item -LiteralPath $artifactRoot -Recurse -Force
+          }
+          New-Item -ItemType Directory -Force -Path $artifactRoot | Out-Null
+
+          $entries = @(
+            "package.json",
+            "package-lock.json",
+            "generated-assets",
+            "client\package.json",
+            "client\dist",
+            "server\package.json",
+            "server\dist",
+            "scripts\prod-startup.ps1",
+            "scripts\windows-prod-startup.mjs"
+          )
+
+          foreach ($entry in $entries) {
+            $sourcePath = Join-Path $env:GITHUB_WORKSPACE $entry
+            $destinationPath = Join-Path $artifactRoot $entry
+            $destinationDir = Split-Path -Parent $destinationPath
+            New-Item -ItemType Directory -Force -Path $destinationDir | Out-Null
+            Copy-Item -LiteralPath $sourcePath -Destination $destinationPath -Recurse -Force
+          }
+
+          Compress-Archive -Path (Join-Path $artifactRoot '*') -DestinationPath $archivePath -Force
+          "STARSTEP_ARTIFACT_PATH=$archivePath" >> $env:GITHUB_ENV
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Upload deployment artifact to S3
+        shell: pwsh
+        run: |
+          $artifactKey = "starstep/${{ github.sha }}/starstep-release.zip"
+          aws s3 cp "$env:STARSTEP_ARTIFACT_PATH" "s3://${{ secrets.STARSTEP_DEPLOY_BUCKET }}/$artifactKey"
+          $artifactUrl = aws s3 presign "s3://${{ secrets.STARSTEP_DEPLOY_BUCKET }}/$artifactKey" --expires-in 3600
+          "STARSTEP_ARTIFACT_URL=$artifactUrl" >> $env:GITHUB_ENV
+
+      - name: Deploy to Windows EC2 over SSM
+        shell: pwsh
+        run: |
+          $scriptContent = Get-Content -Raw (Join-Path $env:GITHUB_WORKSPACE 'scripts\windows-ssm-deploy.ps1')
+          $scriptBase64 = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($scriptContent))
+          $commands = @(
+            '$script = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String(''' + $scriptBase64 + '''))',
+            '$scriptPath = Join-Path $env:TEMP "windows-ssm-deploy.ps1"',
+            'Set-Content -LiteralPath $scriptPath -Value $script',
+            "& powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`" -ArtifactUrl `"$env:STARSTEP_ARTIFACT_URL`" -ReleaseId `"${{ github.sha }}`" -AppRoot `"$env:STARSTEP_APP_ROOT`""
+          ) | ConvertTo-Json -Compress
+
+          $commandId = aws ssm send-command `
+            --instance-ids "${{ secrets.STARSTEP_EC2_INSTANCE_ID }}" `
+            --document-name "AWS-RunPowerShellScript" `
+            --comment "Deploy home-mgt ${{ github.sha }}" `
+            --parameters "commands=$commands" `
+            --query "Command.CommandId" `
+            --output text
+
+          aws ssm wait command-executed `
+            --command-id $commandId `
+            --instance-id "${{ secrets.STARSTEP_EC2_INSTANCE_ID }}"
+
+          aws ssm get-command-invocation `
+            --command-id $commandId `
+            --instance-id "${{ secrets.STARSTEP_EC2_INSTANCE_ID }}"

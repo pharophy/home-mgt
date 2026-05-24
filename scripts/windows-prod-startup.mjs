@@ -25,25 +25,35 @@ export function buildInstallTaskCommand({
   const powerShellPath = getPowerShellPath(windir);
   const startupScriptPath = path.join(repoRoot, "scripts", "prod-startup.ps1");
   return {
-    file: "reg",
+    file: "schtasks",
     args: [
-      "add",
-      "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
-      "/v",
+      "/Create",
+      "/TN",
       TASK_NAME,
-      "/t",
-      "REG_SZ",
-      "/d",
+      "/SC",
+      "ONSTART",
+      "/RU",
+      "SYSTEM",
+      "/TR",
       `"${powerShellPath}" -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "${startupScriptPath}"`,
-      "/f"
+      "/RL",
+      "HIGHEST",
+      "/F"
     ]
   };
 }
 
 export function buildUninstallTaskCommand() {
   return {
-    file: "reg",
-    args: ["delete", "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", "/v", TASK_NAME, "/f"]
+    file: "schtasks",
+    args: ["/Delete", "/TN", TASK_NAME, "/F"]
+  };
+}
+
+export function buildRunTaskCommand() {
+  return {
+    file: "schtasks",
+    args: ["/Run", "/TN", TASK_NAME]
   };
 }
 
