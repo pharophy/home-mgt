@@ -47,7 +47,6 @@ jobs:
           $entries = @(
             "package.json",
             "package-lock.json",
-            "generated-assets",
             "client\package.json",
             "client\dist",
             "server\package.json",

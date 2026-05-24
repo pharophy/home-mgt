@@ -18,7 +18,6 @@ import {
   assert.deepEqual(entries, [
     "package.json",
     "package-lock.json",
-    "generated-assets",
     path.join("client", "package.json"),
     path.join("client", "dist"),
     path.join("server", "package.json"),
