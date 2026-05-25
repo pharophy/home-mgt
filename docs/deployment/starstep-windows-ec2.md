@@ -53,8 +53,6 @@ The GitHub Actions workflow expects these repository secrets:
 - `STARSTEP_EC2_INSTANCE_ID`
 - `STARSTEP_DEPLOY_BUCKET`
 
-`AWS_REGION` is optional. When it is absent, the workflow resolves the region from `STARSTEP_DEPLOY_BUCKET` before it configures AWS credentials.
-
 ## Deployment Flow
 
 The workflow in `.github/workflows/deploy-starstep-windows.yml` does this:
@@ -65,7 +63,7 @@ The workflow in `.github/workflows/deploy-starstep-windows.yml` does this:
 4. Runs the server test suite.
 5. Builds the client and server workspaces.
 6. Creates a release zip containing the built app runtime.
-7. Resolves the AWS region from `AWS_REGION` or the deployment bucket metadata.
+7. Configures AWS credentials for the fixed `us-west-2` deployment region.
 8. Uploads that release zip to S3 and generates a presigned download URL.
 9. Uses AWS Systems Manager to run a remote PowerShell deployment on the Windows EC2 instance.
 

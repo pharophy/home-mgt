@@ -11,7 +11,6 @@ jobs:
     runs-on: windows-latest
     env:
       STARSTEP_APP_ROOT: C:\HostingSpaces\starstep.blabberjax.com\app
-      AWS_REGION: "us-west-2"
     steps:
       - uses: actions/checkout@v4
 
@@ -22,18 +21,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      # - name: Verify Windows startup helper
-      #   run: node scripts/windows-prod-startup.test.mjs
-
-      # - name: Verify deploy artifact helper
-      #   run: node scripts/deploy-artifact.test.mjs
-
-      # - name: Verify AWS region resolver
-      #   run: node scripts/resolve-aws-region.test.mjs
-
-      # - name: Verify deploy workflow helper
-      #   run: node scripts/deploy-workflow.test.mjs
 
       - name: Verify server tests
         run: npm test --workspace server
@@ -73,24 +60,12 @@ jobs:
           Compress-Archive -Path (Join-Path $artifactRoot '*') -DestinationPath $archivePath -Force
           "STARSTEP_ARTIFACT_PATH=$archivePath" >> $env:GITHUB_ENV
 
-      - name: Resolve AWS region
-        id: resolve-aws-region
-        shell: pwsh
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ env.AWS_REGION }}
-          STARSTEP_DEPLOY_BUCKET: ${{ secrets.STARSTEP_DEPLOY_BUCKET }}
-        run: |
-          $resolvedRegion = node scripts/resolve-aws-region.mjs
-          "region=$resolvedRegion" >> $env:GITHUB_OUTPUT
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }} # ${{ steps.resolve-aws-region.outputs.region }}
+          aws-region: us-west-2
 
       - name: Upload deployment artifact to S3
         shell: pwsh
