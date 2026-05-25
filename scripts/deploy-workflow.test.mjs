@@ -16,4 +16,7 @@ assert.match(workflow, /AWS_SECRET_ACCESS_KEY/);
 assert.match(workflow, /STARSTEP_DEPLOY_BUCKET/);
 assert.match(workflow, /\$script = .*FromBase64String.*\);\s*'/s);
 assert.match(workflow, /Set-Content -LiteralPath \$scriptPath -Value \$script;/);
-assert.match(workflow, /-ReleaseId `"\$\{\{ github\.sha \}\}`" -AppRoot `"\$env:STARSTEP_APP_ROOT`";/);
+assert.match(
+  workflow,
+  /\('& powershell\.exe -NoProfile -ExecutionPolicy Bypass -File "\$scriptPath" -ArtifactUrl "\$env:STARSTEP_ARTIFACT_URL" -ReleaseId "\{0\}" -AppRoot "\$env:STARSTEP_APP_ROOT";' -f '\$\{\{ github\.sha \}\}'\)/
+);
