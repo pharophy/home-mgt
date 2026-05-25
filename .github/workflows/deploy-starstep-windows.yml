@@ -77,7 +77,13 @@ jobs:
 
       - name: Deploy to Windows EC2 over SSM
         shell: pwsh
+        env:
+          PYTHONUTF8: "1"
+          PYTHONIOENCODING: "utf-8"
         run: |
+          [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
+          $OutputEncoding = [System.Text.UTF8Encoding]::new()
+          
           $scriptContent = Get-Content -Raw (Join-Path $env:GITHUB_WORKSPACE 'scripts\windows-ssm-deploy.ps1')
           $scriptBase64 = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($scriptContent))
           $commands = @(
