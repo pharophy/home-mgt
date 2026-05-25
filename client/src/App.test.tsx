@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 import App from "./App";
+import starstepLogoPathIcon from "./assets/starstep-logo-path-icon.svg";
+import starstepLogoPath from "./assets/starstep-logo-path.svg";
 import {
   __setInstructionalImageGeneratorForTests
 } from "./app/completion-imagery";
@@ -86,6 +88,39 @@ describe("App", () => {
       prompt: `${activityName}:${stepLabels.join("|")}`
     }));
     vi.useRealTimers();
+  });
+
+  it("renders Starstep branding in the header and exposes the logo as favicon metadata", async () => {
+    fetchMock.mockResolvedValueOnce(stateResponse());
+
+    render(<App />);
+
+    expect(await screen.findByRole("img", { name: /starstep/i })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /starstep/i })).toHaveAttribute("src", starstepLogoPath);
+    expect(document.title).toBe("Starstep");
+
+    const faviconLink = document.head.querySelector('link[rel="icon"]');
+    expect(faviconLink).not.toBeNull();
+    expect(faviconLink).toHaveAttribute("type", "image/svg+xml");
+    expect(faviconLink).toHaveAttribute("href", starstepLogoPathIcon);
+
+    const manifestLink = document.head.querySelector('link[rel="manifest"]');
+    expect(manifestLink).not.toBeNull();
+    expect(manifestLink?.getAttribute("href")).toContain("application/manifest+json");
+    const manifestHref = manifestLink?.getAttribute("href") ?? "";
+    const [, encodedManifest = ""] = manifestHref.split(",", 2);
+    const manifest = JSON.parse(decodeURIComponent(encodedManifest)) as {
+      name: string;
+      short_name: string;
+      icons: Array<{ src: string }>;
+    };
+    expect(manifest.name).toBe("Starstep");
+    expect(manifest.short_name).toBe("Starstep");
+    expect(manifest.icons[0]?.src).toBe(starstepLogoPathIcon);
+
+    const themeColorMeta = document.head.querySelector('meta[name="theme-color"]');
+    expect(themeColorMeta).not.toBeNull();
+    expect(themeColorMeta).toHaveAttribute("content", "#F7F4EA");
   });
 
   it("creates a child profile and keeps the weekly matrix ready for today's plan", async () => {

@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { fetchJson } from "./app/api";
 import { generateInstructionalImage } from "./app/completion-imagery";
 import { actorHeaders, initialState, initialTodayPlan } from "./app/constants";
+import starstepLogoPathIcon from "./assets/starstep-logo-path-icon.svg";
+import starstepLogoPath from "./assets/starstep-logo-path.svg";
 import type {
   ActivityDraft,
   AppRoute,
@@ -190,6 +192,58 @@ export default function App() {
   const shouldBackfillInstructionalImages =
     import.meta.env.MODE !== "test" ||
     Boolean((window as Window & { __enableInstructionalBackfill__?: boolean }).__enableInstructionalBackfill__);
+
+  useEffect(() => {
+    const head = document.head;
+    const manifest = {
+      name: "Starstep",
+      short_name: "Starstep",
+      start_url: "/",
+      scope: "/",
+      display: "standalone",
+      background_color: "#FFFFFF",
+      theme_color: "#F7F4EA",
+      icons: [
+        {
+          src: starstepLogoPathIcon,
+          sizes: "any",
+          type: "image/svg+xml",
+          purpose: "any maskable"
+        }
+      ]
+    };
+
+    const faviconLink = document.createElement("link");
+    faviconLink.setAttribute("rel", "icon");
+    faviconLink.setAttribute("type", "image/svg+xml");
+    faviconLink.setAttribute("sizes", "any");
+    faviconLink.setAttribute("href", starstepLogoPathIcon);
+    faviconLink.dataset.starstepBrand = "favicon";
+    head.append(faviconLink);
+
+    const manifestLink = document.createElement("link");
+    manifestLink.setAttribute("rel", "manifest");
+    manifestLink.setAttribute(
+      "href",
+      `data:application/manifest+json;charset=utf-8,${encodeURIComponent(JSON.stringify(manifest))}`
+    );
+    manifestLink.dataset.starstepBrand = "manifest";
+    head.append(manifestLink);
+
+    const themeColorMeta = document.createElement("meta");
+    themeColorMeta.setAttribute("name", "theme-color");
+    themeColorMeta.setAttribute("content", "#F7F4EA");
+    themeColorMeta.dataset.starstepBrand = "theme-color";
+    head.append(themeColorMeta);
+
+    document.title = "Starstep";
+
+    return () => {
+      faviconLink.remove();
+      manifestLink.remove();
+      themeColorMeta.remove();
+    };
+  }, []);
 
   async function loadTodayPlan(childId: string): Promise<void> {
     const plan = await fetchJson<TodayPlan>(
@@ -1321,6 +1375,14 @@ export default function App() {
           {savingMessage ? <p className="feedback success">{savingMessage}</p> : null}
         </div>
       ) : null}
+
+      <header className="panel app-brand-panel">
+        <img className="app-brand-logo" src={starstepLogoPath} alt="Starstep" />
+        <div className="app-brand-copy">
+          <p className="section-kicker">Shared routines</p>
+          <h1>One step at a time.</h1>
+        </div>
+      </header>
 
       <nav className="mode-switch panel" aria-label="Top-level navigation">
         <button type="button" aria-pressed={activeRoute === "matrix"} onClick={() => navigateTo("matrix")}>

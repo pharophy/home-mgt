@@ -40,6 +40,34 @@ button {
   padding: 2rem 1rem 3rem;
 }
 
+.app-brand-panel {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1rem;
+  padding: 1.15rem 1.4rem;
+}
+
+.app-brand-logo {
+  display: block;
+  width: min(100%, 28rem);
+  max-width: 28rem;
+  height: auto;
+  flex: 0 1 auto;
+}
+
+.app-brand-copy {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.app-brand-copy h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
 .hero-panel,
 .panel,
 .tablet-card {
@@ -1496,6 +1524,11 @@ button {
 }
 
 @media (max-width: 900px) {
+  .app-brand-panel {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .tablet-toolbar,
   .hero-panel,
   .workspace-grid,
