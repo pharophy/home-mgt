@@ -23,7 +23,25 @@ test("resolveManagedGeneratedAssetDir prefers shared generated assets for deploy
   }
 });
 
-test("resolveManagedGeneratedAssetDir falls back to the release directory when shared assets are absent", async () => {
+test("resolveManagedGeneratedAssetDir prefers shared generated assets from the server workspace inside a deployed release", async () => {
+  const repoRoot = await mkdtemp(path.join(os.tmpdir(), "home-mgt-image-assets-"));
+  try {
+    const currentRoot = path.join(repoRoot, "current");
+    const serverRoot = path.join(currentRoot, "server");
+    const sharedRoot = path.join(repoRoot, "shared");
+    await mkdir(serverRoot, { recursive: true });
+    await mkdir(sharedRoot, { recursive: true });
+
+    assert.equal(
+      resolveManagedGeneratedAssetDir(serverRoot),
+      path.join(sharedRoot, "generated-assets")
+    );
+  } finally {
+    await rm(repoRoot, { recursive: true, force: true });
+  }
+});
+
+test("resolveManagedGeneratedAssetDir falls back to the local cwd generated-assets directory when shared assets are absent", async () => {
   const repoRoot = await mkdtemp(path.join(os.tmpdir(), "home-mgt-image-assets-"));
   try {
     const currentRoot = path.join(repoRoot, "current");
@@ -31,7 +49,7 @@ test("resolveManagedGeneratedAssetDir falls back to the release directory when s
 
     assert.equal(
       resolveManagedGeneratedAssetDir(currentRoot),
-      path.join(repoRoot, "generated-assets")
+      path.join(currentRoot, "generated-assets")
     );
   } finally {
     await rm(repoRoot, { recursive: true, force: true });

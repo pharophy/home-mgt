@@ -101,10 +101,32 @@ jobs:
             --query "Command.CommandId" `
             --output text
 
-          aws ssm wait command-executed `
-            --command-id $commandId `
-            --instance-id "${{ secrets.STARSTEP_EC2_INSTANCE_ID }}"
+          $deadline = (Get-Date).AddMinutes(30)
+          while ($true) {
+            $invocation = aws ssm get-command-invocation `
+              --command-id $commandId `
+              --instance-id "${{ secrets.STARSTEP_EC2_INSTANCE_ID }}" `
+              --output json | ConvertFrom-Json
 
-          aws ssm get-command-invocation `
-            --command-id $commandId `
-            --instance-id "${{ secrets.STARSTEP_EC2_INSTANCE_ID }}"
+            if ($invocation.Status -notin @('Pending', 'InProgress', 'Delayed')) {
+              break
+            }
+
+            if ((Get-Date) -ge $deadline) {
+              throw "Timed out waiting for SSM command $commandId to finish."
+            }
+
+            Start-Sleep -Seconds 15
+          }
+
+          if ($invocation.Status -ne 'Success') {
+            throw "SSM deploy failed with status $($invocation.Status): $($invocation.StandardErrorContent)"
+          }
+
+          if ($invocation.StandardOutputContent) {
+            Write-Host $invocation.StandardOutputContent
+          }
+
+          if ($invocation.StandardErrorContent) {
+            Write-Host $invocation.StandardErrorContent
+          }

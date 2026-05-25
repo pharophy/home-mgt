@@ -20,16 +20,22 @@ function decodeUtf8Payload(payload: string): Buffer {
 
 export function resolveManagedGeneratedAssetDir(cwd: string): string {
   const normalizedCwd = path.resolve(cwd);
-  const serverDir = path.basename(normalizedCwd).toLowerCase() === "server";
-  const currentDir = path.basename(normalizedCwd).toLowerCase() === "current";
-  const repoRoot = serverDir || currentDir ? path.dirname(normalizedCwd) : normalizedCwd;
-  const sharedAssetDir = path.join(repoRoot, "shared", "generated-assets");
+  let dir = normalizedCwd;
 
-  if (existsSync(path.join(repoRoot, "shared"))) {
-    return sharedAssetDir;
+  while (true) {
+    const parentDir = path.dirname(dir);
+    if (parentDir === dir) {
+      break;
+    }
+
+    if (existsSync(path.join(parentDir, "shared"))) {
+      return path.join(parentDir, "shared", "generated-assets");
+    }
+
+    dir = parentDir;
   }
 
-  return path.join(repoRoot, "generated-assets");
+  return path.join(normalizedCwd, "generated-assets");
 }
 
 export function isManagedGeneratedAssetPath(
