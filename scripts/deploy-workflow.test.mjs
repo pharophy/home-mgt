@@ -18,5 +18,5 @@ assert.match(workflow, /\$script = .*FromBase64String.*\);\s*'/s);
 assert.match(workflow, /Set-Content -LiteralPath \$scriptPath -Value \$script;/);
 assert.match(
   workflow,
-  /\('& powershell\.exe -NoProfile -ExecutionPolicy Bypass -File "\$scriptPath" -ArtifactUrl "\$env:STARSTEP_ARTIFACT_URL" -ReleaseId "\{0\}" -AppRoot "\$env:STARSTEP_APP_ROOT";' -f '\$\{\{ github\.sha \}\}'\)/
+  /\('& powershell\.exe -NoProfile -ExecutionPolicy Bypass -File "\$scriptPath" -ArtifactUrl "\{0\}" -ReleaseId "\{1\}" -AppRoot "\{2\}";' -f \$env:STARSTEP_ARTIFACT_URL, '\$\{\{ github\.sha \}\}', \$env:STARSTEP_APP_ROOT\)/
 );
