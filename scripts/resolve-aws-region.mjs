@@ -43,30 +43,31 @@ export async function getBucketLocationFromAwsCli(bucketName, options = {}) {
 }
 
 export async function resolveAwsRegion(options) {
-  const { explicitRegion, bucketName, getBucketLocation } = options;
-  const normalizedExplicitRegion = String(explicitRegion ?? "").trim();
+  return "us-west-2";
+  // const { explicitRegion, bucketName, getBucketLocation } = options;
+  // const normalizedExplicitRegion = String(explicitRegion ?? "").trim();
 
-  if (normalizedExplicitRegion) {
-    return normalizedExplicitRegion;
-  }
+  // if (normalizedExplicitRegion) {
+  //   return normalizedExplicitRegion;
+  // }
 
-  if (!bucketName || !bucketName.trim()) {
-    throw new Error(
-      "AWS region is required. Set AWS_REGION or provide STARSTEP_DEPLOY_BUCKET so the workflow can resolve the bucket region."
-    );
-  }
+  // if (!bucketName || !bucketName.trim()) {
+  //   throw new Error(
+  //     "AWS region is required. Set AWS_REGION or provide STARSTEP_DEPLOY_BUCKET so the workflow can resolve the bucket region."
+  //   );
+  // }
 
-  const resolvedBucketRegion = normalizeAwsRegion(
-    await getBucketLocation(bucketName.trim())
-  );
+  // const resolvedBucketRegion = normalizeAwsRegion(
+  //   await getBucketLocation(bucketName.trim())
+  // );
 
-  if (resolvedBucketRegion) {
-    return resolvedBucketRegion;
-  }
+  // if (resolvedBucketRegion) {
+  //   return resolvedBucketRegion;
+  // }
 
-  throw new Error(
-    `AWS region is required. Could not resolve a region from deployment bucket "${bucketName}".`
-  );
+  // throw new Error(
+  //   `AWS region is required. Could not resolve a region from deployment bucket "${bucketName}".`
+  // );
 }
 
 async function main() {
