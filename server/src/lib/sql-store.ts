@@ -140,7 +140,21 @@ function normalizeConnectionString(connectionString: string): string {
   const normalizedParts = connectionString
     .split(";")
     .map((part) => part.trim())
-    .filter((part) => part.length > 0);
+    .filter((part) => part.length > 0)
+    .filter((part) => {
+      const separatorIndex = part.indexOf("=");
+      if (separatorIndex < 0) {
+        return true;
+      }
+
+      const key = part.slice(0, separatorIndex).trim().toLowerCase();
+      const value = part.slice(separatorIndex + 1).trim().toLowerCase();
+      if (key !== "trusted_connection") {
+        return true;
+      }
+
+      return value === "yes" || value === "true";
+    });
 
   return normalizedParts.length > 0 ? `${normalizedParts.join(";")};` : connectionString;
 }
