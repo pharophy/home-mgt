@@ -1,5 +1,7 @@
 # home-mgt
 
+<!-- No-op change to trigger a deploy verification run. -->
+
 `home-mgt` is a tablet-first preschool participation MVP for parents of a 4-year-old. It helps a child follow visual routines, complete simple chores, and get immediate feedback on a shared household tablet while still giving parents and caregivers clear control.
 
 ## Current MVP
