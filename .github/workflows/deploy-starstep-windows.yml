@@ -90,7 +90,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ steps.resolve-aws-region.outputs.region }}
+          aws-region: ${{ secrets.AWS_REGION }} # ${{ steps.resolve-aws-region.outputs.region }}
 
       - name: Upload deployment artifact to S3
         shell: pwsh
