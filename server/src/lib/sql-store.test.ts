@@ -164,13 +164,13 @@ test("buildMssqlConnectionConfig preserves Windows-auth ODBC attributes for name
   });
 });
 
-test("buildMssqlConnectionConfig strips false trusted connection flags from explicit credential strings", () => {
+test("buildMssqlConnectionConfig normalizes ODBC boolean flags for explicit credential strings", () => {
   const connectionString =
     "Driver={ODBC Driver 17 for SQL Server};Server=i-08eb36fff6e5b9f2a.us-west-2.compute.internal,1433\\SQLEXPRESS;Database=StarStep;User ID=Bjx_Admin;Password=secret;Trusted_Connection=False;TrustServerCertificate=True;";
 
   assert.deepEqual(buildMssqlConnectionConfig(connectionString), {
     connectionString:
-      "Driver={ODBC Driver 17 for SQL Server};Server=i-08eb36fff6e5b9f2a.us-west-2.compute.internal,1433\\SQLEXPRESS;Database=StarStep;User ID=Bjx_Admin;Password=secret;TrustServerCertificate=True;",
+      "Driver={ODBC Driver 17 for SQL Server};Server=i-08eb36fff6e5b9f2a.us-west-2.compute.internal,1433\\SQLEXPRESS;Database=StarStep;User ID=Bjx_Admin;Password=secret;Trusted_Connection=No;TrustServerCertificate=Yes;",
     options: {
       trustedConnection: false,
       trustServerCertificate: true

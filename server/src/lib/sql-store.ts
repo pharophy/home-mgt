@@ -148,15 +148,31 @@ function normalizeConnectionString(connectionString: string): string {
       }
 
       const key = part.slice(0, separatorIndex).trim().toLowerCase();
-      const value = part.slice(separatorIndex + 1).trim().toLowerCase();
-      if (key !== "trusted_connection") {
+      if (key !== "trusted_connection" && key !== "trustservercertificate") {
         return true;
       }
 
-      return value === "yes" || value === "true";
+      return true;
     });
 
-  return normalizedParts.length > 0 ? `${normalizedParts.join(";")};` : connectionString;
+  const canonicalParts = normalizedParts.map((part) => {
+    const separatorIndex = part.indexOf("=");
+    if (separatorIndex < 0) {
+      return part;
+    }
+
+    const key = part.slice(0, separatorIndex).trim();
+    const normalizedKey = key.toLowerCase();
+    if (normalizedKey !== "trusted_connection" && normalizedKey !== "trustservercertificate") {
+      return part;
+    }
+
+    const rawValue = part.slice(separatorIndex + 1).trim().toLowerCase();
+    const value = rawValue === "yes" || rawValue === "true" ? "Yes" : "No";
+    return `${key}=${value}`;
+  });
+
+  return canonicalParts.length > 0 ? `${canonicalParts.join(";")};` : connectionString;
 }
 
 export function buildMssqlConnectionConfig(connectionString: string): {
