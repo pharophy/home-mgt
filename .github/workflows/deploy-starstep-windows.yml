@@ -81,10 +81,10 @@ jobs:
           $scriptContent = Get-Content -Raw (Join-Path $env:GITHUB_WORKSPACE 'scripts\windows-ssm-deploy.ps1')
           $scriptBase64 = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($scriptContent))
           $commands = @(
-            '$script = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String(''' + $scriptBase64 + '''))',
-            '$scriptPath = Join-Path $env:TEMP "windows-ssm-deploy.ps1"',
-            'Set-Content -LiteralPath $scriptPath -Value $script',
-            "& powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`" -ArtifactUrl `"$env:STARSTEP_ARTIFACT_URL`" -ReleaseId `"${{ github.sha }}`" -AppRoot `"$env:STARSTEP_APP_ROOT`""
+            '$script = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String(''' + $scriptBase64 + '''));',
+            '$scriptPath = Join-Path $env:TEMP "windows-ssm-deploy.ps1";',
+            'Set-Content -LiteralPath $scriptPath -Value $script;',
+            "& powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`" -ArtifactUrl `"$env:STARSTEP_ARTIFACT_URL`" -ReleaseId `"${{ github.sha }}`" -AppRoot `"$env:STARSTEP_APP_ROOT`";"
           ) | ConvertTo-Json -Compress
 
           $commandId = aws ssm send-command `

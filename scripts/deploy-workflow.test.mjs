@@ -14,3 +14,6 @@ assert.doesNotMatch(workflow, /^\s+\$resolvedRegion = node scripts\/resolve-aws-
 assert.match(workflow, /AWS_ACCESS_KEY_ID/);
 assert.match(workflow, /AWS_SECRET_ACCESS_KEY/);
 assert.match(workflow, /STARSTEP_DEPLOY_BUCKET/);
+assert.match(workflow, /\$script = .*FromBase64String.*\);\s*'/s);
+assert.match(workflow, /Set-Content -LiteralPath \$scriptPath -Value \$script;/);
+assert.match(workflow, /-ReleaseId `"\$\{\{ github\.sha \}\}`" -AppRoot `"\$env:STARSTEP_APP_ROOT`";/);
