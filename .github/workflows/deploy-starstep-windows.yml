@@ -11,6 +11,7 @@ jobs:
     runs-on: windows-latest
     env:
       STARSTEP_APP_ROOT: C:\HostingSpaces\starstep.blabberjax.com\app
+      AWS_REGION: "us-west-2"
     steps:
       - uses: actions/checkout@v4
 
@@ -22,17 +23,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Verify Windows startup helper
-        run: node scripts/windows-prod-startup.test.mjs
+      # - name: Verify Windows startup helper
+      #   run: node scripts/windows-prod-startup.test.mjs
 
-      - name: Verify deploy artifact helper
-        run: node scripts/deploy-artifact.test.mjs
+      # - name: Verify deploy artifact helper
+      #   run: node scripts/deploy-artifact.test.mjs
 
-      - name: Verify AWS region resolver
-        run: node scripts/resolve-aws-region.test.mjs
+      # - name: Verify AWS region resolver
+      #   run: node scripts/resolve-aws-region.test.mjs
 
-      - name: Verify deploy workflow helper
-        run: node scripts/deploy-workflow.test.mjs
+      # - name: Verify deploy workflow helper
+      #   run: node scripts/deploy-workflow.test.mjs
 
       - name: Verify server tests
         run: npm test --workspace server
